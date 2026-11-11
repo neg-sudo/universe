@@ -262,6 +262,7 @@ export function initToolForms() {
     });
 
     const prefilled = prefillFromUrl(form);
+    if (prefilled) applyVisibility(form);
     if (prefilled || form.dataset.autorun === 'true') run();
   }
 }
