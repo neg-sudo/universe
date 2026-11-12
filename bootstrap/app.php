@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         apiPrefix: 'api/v1',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Render, Fly, Railway and similar platforms terminate TLS at a proxy.
+        // Trusting their forwarded headers keeps generated URLs and cookies HTTPS.
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             SecurityHeaders::class,
         ]);

@@ -73,6 +73,11 @@ class PlatformTest extends TestCase
         $response->assertOk();
         $response->assertSee('Percentage Calculator');
         $response->assertSee('knowledge/');
+
+        // Keyword-only matches exercise the JSON-cast path used by PostgreSQL.
+        $this->get('/search?q=discount')
+            ->assertOk()
+            ->assertSee('Percentage Calculator');
     }
 
     public function test_search_requires_at_least_two_characters(): void

@@ -33,7 +33,7 @@ final class SearchService
             ->where(function ($query) use ($like) {
                 $query->whereRaw('LOWER(name) LIKE ?', [$like])
                     ->orWhereRaw('LOWER(description) LIKE ?', [$like])
-                    ->orWhereRaw('LOWER(keywords) LIKE ?', [$like]);
+                    ->orWhereRaw('LOWER(CAST(keywords AS TEXT)) LIKE ?', [$like]);
             })
             ->limit(150)
             ->get()
@@ -45,7 +45,7 @@ final class SearchService
             ->where(function ($query) use ($like) {
                 $query->whereRaw('LOWER(title) LIKE ?', [$like])
                     ->orWhereRaw('LOWER(summary) LIKE ?', [$like])
-                    ->orWhereRaw('LOWER(tags) LIKE ?', [$like])
+                    ->orWhereRaw('LOWER(CAST(tags AS TEXT)) LIKE ?', [$like])
                     ->orWhereRaw('LOWER(content) LIKE ?', [$like]);
             })
             ->limit(200)

@@ -1,0 +1,145 @@
+# Deploying UniVerse for free
+
+UniVerse is a Laravel application, so it needs a PHP runtime and a database. Cloudflare Pages/Workers cannot host it directly without a rewrite. The free path that keeps the app intact is:
+
+```
+GitHub (code) → Render free web service (Docker) → Neon free PostgreSQL
+                              ↓
+                    Cloudflare DNS / SSL (optional)
+```
+
+| Piece | Free tier | Catch |
+| --- | --- | --- |
+| GitHub | Public/private repositories, Actions minutes | None for this project |
+| Render | Free web service, 512 MB RAM | Sleeps after ~15 minutes idle; 30–60 s cold start |
+| Neon | 0.5 GB PostgreSQL | Suspends after idle; wakes on the next query |
+| Cloudflare DNS | Free DNS, SSL, CDN, basic WAF | Domain registration is not free |
+| Cloudflare Tunnel | Free public `trycloudflare.com` URL | Your computer must stay on |
+
+This repository already contains:
+
+- `Dockerfile` and `docker/` — production PHP 8.4 + Apache image.
+- `render.yaml` — Render Blueprint for the web service.
+- `.github/workflows/tests.yml` — free CI on every push.
+- `docker/entrypoint.sh` — waits for PostgreSQL, runs migrations, optionally seeds, then caches config/routes/views.
+
+## 1. Publish the repository
+
+The project is already pushed to GitHub. If you fork or copy it, keep the `Dockerfile`, `render.yaml` and `docker/` directory.
+
+Never commit `.env`, database files or `tokens.md`.
+
+## 2. Create a free PostgreSQL database
+
+1. Sign up at <https://neon.com> (no credit card required).
+2. Create a project, for example `universe`.
+3. Copy the **direct connection** string. It looks like:
+   ```
+   postgresql://user:password@ep-xxx.region.aws.neon.tech/neondb?sslmode=require
+   ```
+4. Keep it secret. It becomes the `DB_URL` value in Render.
+
+Neon's free database is small but more than enough for 100 tools and 500 articles. It suspends when idle and resumes automatically.
+
+## 3. Deploy on Render
+
+1. Sign up at <https://render.com> with GitHub (no card required for the free plan).
+2. Choose **New → Blueprint**.
+3. Connect the GitHub repository.
+4. Render reads `render.yaml` and creates the `universe` web service.
+5. When prompted, set:
+   - `DB_URL` — the Neon direct connection string.
+   - `APP_URL` — leave blank for the first deploy, then set it to the public Render URL (for example `https://universe.onrender.com`).
+6. Apply the blueprint. The first Docker build takes a few minutes.
+7. After the first deploy, set `APP_URL` to the real URL and trigger **Manual Deploy → Clear build cache & deploy** (or just redeploy).
+
+The entrypoint runs `php artisan migrate --force` on every boot and seeds the catalogue when `SEED_DATABASE=true` (the blueprint default). Seeding is idempotent, so restarts do not duplicate rows.
+
+### Verify
+
+Replace the host with your Render URL:
+
+```bash
+curl -I https://universe.onrender.com/up
+curl -s https://universe.onrender.com/api/v1/tools | head
+curl -s "https://universe.onrender.com/api/v1/search?q=percentage" | head
+```
+
+Then open `/`, `/tools`, `/tools/percentage-calculator`, `/knowledge` and `/search?q=percentage` in a browser.
+
+## 4. Optional: custom domain with Cloudflare
+
+1. Add the domain to Cloudflare (free plan) and change the registrar nameservers.
+2. In Render, add the custom domain to the web service.
+3. In Cloudflare DNS, create the CNAME Render shows you. Keep the proxy **enabled** (orange cloud) if you want Cloudflare caching and WAF.
+4. Set Cloudflare SSL/TLS mode to **Full (strict)**.
+5. Set `APP_URL=https://your-domain.example` in Render and redeploy.
+
+Cloudflare caches `/assets/*` automatically through its CDN. The application already sends a strict CSP and security headers.
+
+## Alternative: free demo without a server
+
+If you only need to show the app to someone, run it locally and expose it through a free Cloudflare quick tunnel:
+
+```bash
+cd /home/neg/Projects/UniVerse
+php artisan serve --host=127.0.0.1 --port=8000
+# in another terminal
+cloudflared tunnel --url http://localhost:8000
+```
+
+The command prints a temporary `https://….trycloudflare.com` URL. It stops working when the process or computer stops. Do not use this for production.
+
+## Alternative: shared PHP hosting
+
+HelioHost (<https://heliohost.us>) offers free PHP 8, PostgreSQL and 1 GB of storage. It can run Laravel, but deployment is manual:
+
+1. Upload the project outside the web root.
+2. Point the domain's document root at `public/`.
+3. Create a PostgreSQL database and set `DB_URL` or the individual `DB_*` variables.
+4. Run `composer install --no-dev`, `php artisan migrate --seed`, and `php artisan optimize` over SSH if available.
+5. Set `APP_ENV=production`, `APP_DEBUG=false`, a real `APP_KEY` and `APP_URL`.
+
+Check that the plan provides PHP 8.3 or newer (Laravel 13's requirement) and SSH or a terminal. Without SSH, migrations and Composer are painful.
+
+Wasmer (<https://wasmer.io/laravel-hosting>) also advertises a free Laravel tier with 100k requests/month and a managed database. Treat these free tiers as demos and verify current limits before relying on them.
+
+## Environment variables
+
+| Variable | Value |
+| --- | --- |
+| `APP_NAME` | `UniVerse` |
+| `APP_ENV` | `production` |
+| `APP_DEBUG` | `false` |
+| `APP_KEY` | Generated by Render (`generateValue: true`) |
+| `APP_URL` | Public HTTPS URL |
+| `DB_CONNECTION` | `pgsql` |
+| `DB_URL` | Neon/PostgreSQL connection string |
+| `SEED_DATABASE` | `true` on first deploy, then optionally `false` |
+| `SESSION_DRIVER` | `database` |
+| `SESSION_SECURE_COOKIE` | `true` |
+| `CACHE_STORE` | `database` |
+| `QUEUE_CONNECTION` | `sync` |
+| `LOG_CHANNEL` | `stderr` |
+
+`bootstrap/app.php` trusts forwarded proxy headers so HTTPS URLs, secure cookies and redirects work behind Render, Fly, Railway and Cloudflare.
+
+## Troubleshooting
+
+| Symptom | Likely cause |
+| --- | --- |
+| 500 on every page | `APP_KEY` missing, `DB_URL` wrong, or migrations failed. Check Render logs. |
+| 0 tools / 0 articles | `SEED_DATABASE` was false on an empty database. Set it to `true` and redeploy. |
+| Assets 404 | Apache document root must be `public/`. The bundled `docker/apache.conf` handles this. |
+| Redirect loop or `http://` URLs | Proxy headers not trusted, or `APP_URL` still `http://localhost`. |
+| Database connection timeout | Neon project is suspended or the connection string uses the wrong host. |
+| Cold start takes a minute | Render free services sleep after inactivity. Upgrade or use a keep-alive ping if needed. |
+
+## Free-tier reality check
+
+- **Render free** is fine for a portfolio, demo or low-traffic educational site. It is not an always-on production service.
+- **Neon free** is enough for this dataset, but check storage and compute limits.
+- **GitHub Actions** is free for public repositories and includes a monthly allowance for private ones.
+- Free tiers change. Verify current limits before launch.
+
+The application itself has no paid dependencies: no Vite build, no queue worker, no Redis, no object storage.

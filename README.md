@@ -69,6 +69,16 @@ DB_PASSWORD=secret
 
 Then run `php artisan migrate --seed`. The schema uses standard Laravel column types and adds a `CHECK` constraint on `bookmarks` when the driver is PostgreSQL.
 
+## Deploy for free
+
+A production `Dockerfile`, Render Blueprint and step-by-step guide are included:
+
+```
+GitHub → Render free web service (Docker) → Neon free PostgreSQL
+```
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the complete walkthrough, environment variables and free-tier caveats. For a quick demo, a free Cloudflare Tunnel can expose the local server without deploying anything.
+
 ## Content pipeline
 
 Tool definitions live in `content/tools/*.php`. After editing them, rebuild the client engine and run the calculation tests:
@@ -127,6 +137,7 @@ docs/                        Architecture, database, API and schema docs
 
 ## Documentation
 
+- [Deployment (free)](docs/DEPLOYMENT.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Database](docs/DATABASE.md)
 - [API](docs/API.md)
