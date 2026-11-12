@@ -43,13 +43,15 @@ RUN composer dump-autoload --optimize --no-dev --no-interaction \
         storage/framework/sessions \
         storage/framework/views \
         storage/logs \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && chown -R www-data:www-data database storage bootstrap/cache
 
-COPY docker/apache.conf /etc/apache2/sites-available/000-default.conf
+RUN mkdir -p /etc/apache2/templates
+
+COPY docker/apache.conf /etc/apache2/templates/apache.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 
-EXPOSE 80
+EXPOSE 80 10000
 
 ENTRYPOINT ["entrypoint"]
 CMD ["apache2-foreground"]

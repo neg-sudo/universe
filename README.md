@@ -79,6 +79,8 @@ GitHub → Render free web service (Docker) → Neon free PostgreSQL
 
 See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the complete walkthrough, environment variables and free-tier caveats. For a quick demo, a free Cloudflare Tunnel can expose the local server without deploying anything.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/neg-sudo/universe)
+
 ## Content pipeline
 
 Tool definitions live in `content/tools/*.php`. After editing them, rebuild the client engine and run the calculation tests:
