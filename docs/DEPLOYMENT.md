@@ -80,9 +80,8 @@ Neon's free database is small but more than enough for 100 tools and 500 article
 5. When prompted, set:
    - `DB_URL` — the Neon direct connection string.
    - `APP_KEY` — optional. Run `php artisan key:generate --show` locally and paste the `base64:…` value. If left blank, the container generates one at boot; sessions reset on every restart.
-   - `APP_URL` — leave blank for the first deploy, then set it to the public Render URL (for example `https://universe.onrender.com`).
 6. Apply the blueprint. The first Docker build takes a few minutes.
-7. After the first deploy, set `APP_URL` to the real URL and trigger **Manual Deploy → Clear build cache & deploy** (or just redeploy).
+7. `APP_URL` is detected automatically from Render's `RENDER_EXTERNAL_URL`, so links and cookies use the public HTTPS host without extra setup. Only set `APP_URL` manually if you add a custom domain.
 
 The entrypoint runs `php artisan migrate --force` on every boot and seeds the catalogue when `SEED_DATABASE=true` (the blueprint default). Seeding is idempotent, so restarts do not duplicate rows.
 
@@ -143,7 +142,7 @@ Wasmer (<https://wasmer.io/laravel-hosting>) also advertises a free Laravel tier
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | `false` |
 | `APP_KEY` | `php artisan key:generate --show`, or let the entrypoint generate one (sessions reset on restart) |
-| `APP_URL` | Public HTTPS URL |
+| `APP_URL` | Auto-detected from `RENDER_EXTERNAL_URL`; set manually only for a custom domain |
 | `DB_CONNECTION` | `pgsql` |
 | `DB_URL` | Neon/PostgreSQL connection string |
 | `SEED_DATABASE` | `true` on first deploy, then optionally `false` |

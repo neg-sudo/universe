@@ -54,6 +54,8 @@ RUN composer dump-autoload --optimize --no-dev --no-interaction \
 RUN mkdir -p /etc/apache2/templates
 
 COPY docker/apache.conf /etc/apache2/templates/apache.conf
+COPY docker/mpm_prefork.conf /etc/apache2/mods-available/mpm_prefork.conf
+COPY docker/php.ini /usr/local/etc/php/conf.d/zz-universe.ini
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
 

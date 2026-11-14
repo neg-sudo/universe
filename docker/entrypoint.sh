@@ -14,6 +14,12 @@ if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
+# Render exposes the public URL; use it unless APP_URL is set explicitly.
+# This keeps asset links, redirects and cookies on the right host.
+if [ -z "${APP_URL:-}" ] && [ -n "${RENDER_EXTERNAL_URL:-}" ]; then
+    export APP_URL="$RENDER_EXTERNAL_URL"
+fi
+
 # Generate a valid Laravel key if the platform did not provide one.
 # Set APP_KEY in the dashboard for stable sessions across restarts.
 if [ -z "${APP_KEY:-}" ] && ! grep -qE '^APP_KEY=base64:.+' .env; then
