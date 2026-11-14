@@ -3,10 +3,13 @@
 FROM php:8.4-apache
 
 # Runtime extensions required by Laravel and PostgreSQL.
+# libpq-dev provides pg_config and libpq-fe.h for the pdo_pgsql build.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libicu-dev \
         libonig-dev \
+        libpq-dev \
+        libsqlite3-dev \
         libzip-dev \
         unzip \
     && docker-php-ext-install -j"$(nproc)" \
@@ -19,6 +22,9 @@ RUN apt-get update \
         zip \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
+
+# Fail the build early if the database drivers are missing.
+RUN php -m | grep -qi '^pdo_pgsql$' && php -m | grep -qi '^pdo_sqlite$'
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
