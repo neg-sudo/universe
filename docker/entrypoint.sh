@@ -20,6 +20,22 @@ if [ -z "${APP_URL:-}" ] && [ -n "${RENDER_EXTERNAL_URL:-}" ]; then
     export APP_URL="$RENDER_EXTERNAL_URL"
 fi
 
+# Render's generated APP_KEY is a 256-bit base64 string, not Laravel's
+# "base64:..." form. Derive a stable 32-byte key from it so sessions survive
+# restarts. A key supplied as base64:... or as exactly 32 bytes is kept as is.
+case "${APP_KEY:-}" in
+    "")
+        ;;
+    base64:*)
+        ;;
+    *)
+        if [ "${#APP_KEY}" -ne 32 ]; then
+            APP_KEY="base64:$(APP_KEY="$APP_KEY" php -r 'echo base64_encode(hash("sha256", getenv("APP_KEY"), true));')"
+            export APP_KEY
+        fi
+        ;;
+esac
+
 # Generate a valid Laravel key if the platform did not provide one.
 # Set APP_KEY in the dashboard for stable sessions across restarts.
 if [ -z "${APP_KEY:-}" ] && ! grep -qE '^APP_KEY=base64:.+' .env; then
