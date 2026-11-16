@@ -100,10 +100,10 @@ content/tools/*.php
 
 ```
 content/articles/topics.php          planned categories, subcategories and titles
-  │  php scripts/fetch-wikipedia.php
+  │  php scripts/harvest-wikipedia.php
   ├── Wikipedia API (intro extracts, CC BY-SA 4.0)
   ├── content/articles/cache/        resumable response cache
-  └── content/articles/data.json     article records
+  └── content/articles/data/         sharded article JSONL + manifest
         │  php artisan db:seed --class=ArticleSeeder
         └── articles table
 ```

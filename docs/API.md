@@ -45,9 +45,9 @@ Query parameters:
   ],
   "meta": {
     "current_page": 1,
-    "last_page": 2,
+    "last_page": 4,
     "per_page": 50,
-    "total": 100
+    "total": 200
   }
 }
 ```
@@ -119,9 +119,9 @@ Query parameters:
   ],
   "meta": {
     "current_page": 1,
-    "last_page": 25,
+    "last_page": 500,
     "per_page": 20,
-    "total": 500
+    "total": 10000
   }
 }
 ```

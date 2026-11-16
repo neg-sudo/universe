@@ -2,6 +2,149 @@
 // Run `php scripts/build-tools.php` after changing content/tools/*.php.
 
 export const TOOLS = {
+  "acceleration-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toMs2 = { ms2: 1, fts2: 0.3048, g: 9.80665 };
+          const ms2 = value * (toMs2[v.from] ?? 1);
+          return [
+              { label: 'Metres per second squared', value: ms2, unit: 'm/s²' },
+              { label: 'Feet per second squared', value: ms2 / 0.3048, unit: 'ft/s²' },
+              { label: 'Standard gravity', value: ms2 / 9.80665, unit: 'g' },
+          ];
+  },
+  "torque-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toNm = { nm: 1, lbft: 1.3558179483314, kgfm: 9.80665 };
+          const nm = value * (toNm[v.from] ?? 1);
+          return [
+              { label: 'Newton-metres', value: nm, unit: 'N·m' },
+              { label: 'Pound-feet', value: nm / 1.3558179483314, unit: 'lbf·ft' },
+              { label: 'Kilogram-force metres', value: nm / 9.80665, unit: 'kgf·m' },
+          ];
+  },
+  "frequency-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toHz = { hz: 1, khz: 1e3, mhz: 1e6, ghz: 1e9 };
+          const hz = value * (toHz[v.from] ?? 1);
+          return [
+              { label: 'Hertz', value: hz, unit: 'Hz' },
+              { label: 'Kilohertz', value: hz / 1e3, unit: 'kHz' },
+              { label: 'Megahertz', value: hz / 1e6, unit: 'MHz' },
+              { label: 'Gigahertz', value: hz / 1e9, unit: 'GHz' },
+          ];
+  },
+  "force-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toN = { n: 1, kn: 1000, lbf: 4.4482216152605, kgf: 9.80665 };
+          const n = value * (toN[v.from] ?? 1);
+          return [
+              { label: 'Newtons', value: n, unit: 'N' },
+              { label: 'Kilonewtons', value: n / 1000, unit: 'kN' },
+              { label: 'Pound-force', value: n / 4.4482216152605, unit: 'lbf' },
+              { label: 'Kilogram-force', value: n / 9.80665, unit: 'kgf' },
+          ];
+  },
+  "density-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toKgM3 = { kgm3: 1, gcm3: 1000, lbft3: 16.01846337396 };
+          const kgm3 = value * (toKgM3[v.from] ?? 1);
+          return [
+              { label: 'Kilograms per cubic metre', value: kgm3, unit: 'kg/m³' },
+              { label: 'Grams per cubic centimetre', value: kgm3 / 1000, unit: 'g/cm³' },
+              { label: 'Pounds per cubic foot', value: kgm3 / 16.01846337396, unit: 'lb/ft³' },
+          ];
+  },
+  "flow-rate-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toLps = { ls: 1, lmin: 1 / 60, m3h: 1000 / 3600, gpm: 3.785411784 / 60 };
+          const lps = value * (toLps[v.from] ?? 1);
+          return [
+              { label: 'Litres per second', value: lps, unit: 'L/s' },
+              { label: 'Litres per minute', value: lps * 60, unit: 'L/min' },
+              { label: 'Cubic metres per hour', value: lps * 3.6, unit: 'm³/h' },
+              { label: 'US gallons per minute', value: lps * 60 / 3.785411784, unit: 'gal/min' },
+          ];
+  },
+  "illuminance-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toLux = { lux: 1, fc: 10.763910416709722, phot: 10000 };
+          const lux = value * (toLux[v.from] ?? 1);
+          return [
+              { label: 'Lux', value: lux, unit: 'lx' },
+              { label: 'Foot-candles', value: lux / 10.763910416709722, unit: 'fc' },
+              { label: 'Phot', value: lux / 10000, unit: 'ph' },
+          ];
+  },
+  "viscosity-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toPas = { pas: 1, mpas: 0.001, p: 0.1 };
+          const pas = value * (toPas[v.from] ?? 1);
+          return [
+              { label: 'Pascal-seconds', value: pas, unit: 'Pa·s' },
+              { label: 'Millipascal-seconds', value: pas * 1000, unit: 'mPa·s' },
+              { label: 'Poise', value: pas * 10, unit: 'P' },
+          ];
+  },
+  "typography-converter": (v, h) => {
+          const value = h.n(v.value);
+          const base = h.n(v.base);
+          if (base <= 0) throw new Error('Base font size must be greater than zero.');
+          let px;
+          if (v.from === 'pt') px = value * 96 / 72;
+          else if (v.from === 'rem' || v.from === 'em') px = value * base;
+          else if (v.from === 'percent') px = value / 100 * base;
+          else px = value;
+          return [
+              { label: 'Pixels', value: px, unit: 'px' },
+              { label: 'Points', value: px * 72 / 96, unit: 'pt' },
+              { label: 'Root em', value: px / base, unit: 'rem' },
+              { label: 'Em', value: px / base, unit: 'em' },
+          ];
+  },
+  "paper-size-converter": (v, h) => {
+          const sizes = {
+              a0: [841, 1189], a1: [594, 841], a2: [420, 594], a3: [297, 420], a4: [210, 297],
+              a5: [148, 210], a6: [105, 148], a7: [74, 105], a8: [52, 74],
+              b4: [250, 353], b5: [176, 250], b6: [125, 176], letter: [215.9, 279.4], legal: [215.9, 355.6],
+          };
+          const size = sizes[v.size] || sizes.a4;
+          const factor = v.unit === 'in' ? 1 / 25.4 : 1;
+          const width = size[0] * factor;
+          const height = size[1] * factor;
+          return [
+              { label: 'Width', value: width, unit: v.unit === 'in' ? 'in' : 'mm' },
+              { label: 'Height', value: height, unit: v.unit === 'in' ? 'in' : 'mm' },
+              { label: 'Area', value: width * height, unit: v.unit === 'in' ? 'in²' : 'mm²' },
+          ];
+  },
+  "aspect-ratio-calculator": (v, h) => {
+          const width = h.n(v.width), height = h.n(v.height);
+          if (width <= 0 || height <= 0) throw new Error('Width and height must be greater than zero.');
+          const gcd = (a, b) => {
+              a = Math.abs(a); b = Math.abs(b);
+              while (b) { const t = b; b = a % b; a = t; }
+              return a || 1;
+          };
+          const isInt = Number.isInteger(width) && Number.isInteger(height);
+          const ratio = isInt ? `${width / gcd(width, height)}:${height / gcd(width, height)}` : `${h.round(width / height, 2)}:1`;
+          return [
+              { label: 'Aspect ratio', value: ratio },
+              { label: 'Decimal ratio', value: width / height },
+              { label: 'Diagonal', value: Math.hypot(width, height), unit: 'px' },
+              { label: 'Megapixels', value: (width * height) / 1e6, unit: 'MP' },
+          ];
+  },
+  "data-transfer-rate-converter": (v, h) => {
+          const value = h.n(v.value);
+          const toBps = { bps: 1, kbps: 1e3, mbps: 1e6, gbps: 1e9, mbs: 8e6 };
+          const bps = value * (toBps[v.from] ?? 1);
+          return [
+              { label: 'Bits per second', value: bps, unit: 'bps' },
+              { label: 'Kilobits per second', value: bps / 1e3, unit: 'Kbps' },
+              { label: 'Megabits per second', value: bps / 1e6, unit: 'Mbps' },
+              { label: 'Megabytes per second', value: bps / 8e6, unit: 'MB/s' },
+          ];
+  },
   "length-converter": (v, h) => {
           const table = { m: 1, km: 1000, cm: 0.01, mm: 0.001, mi: 1609.344, yd: 0.9144, ft: 0.3048, in: 0.0254 };
           const labels = { m: 'm', km: 'km', cm: 'cm', mm: 'mm', mi: 'mi', yd: 'yd', ft: 'ft', in: 'in' };
@@ -186,6 +329,195 @@ export const TOOLS = {
           return [
               { label: 'Result', value: value * factor, unit: labels[v.to], hint: `1 ${labels[v.from]} = ${h.round(factor, 10)} ${labels[v.to]}` },
               { label: 'Conversion factor', value: factor, hint: 'Grams assume water density: 1 g = 1 mL.' },
+          ];
+  },
+  "months-between-dates": (v, h) => {
+          const parse = (s) => {
+              const p = String(s).split('-').map(Number);
+              if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter valid dates.');
+              return Date.UTC(p[0], p[1] - 1, p[2]);
+          };
+          const start = parse(v.start), end = parse(v.end);
+          const a = new Date(start), b = new Date(end);
+          let months = (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + (b.getUTCMonth() - a.getUTCMonth());
+          if (b.getUTCDate() < a.getUTCDate()) months -= 1;
+          const days = Math.round((end - start) / 86400000);
+          return [
+              { label: 'Months', value: months, decimals: 0 },
+              { label: 'Days', value: days, decimals: 0 },
+              { label: 'Years', value: months / 12 },
+          ];
+  },
+  "next-birthday-calculator": (v, h) => {
+          const parse = (s) => {
+              const p = String(s).split('-').map(Number);
+              if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter a valid birth date.');
+              return { y: p[0], m: p[1], d: p[2] };
+          };
+          const birth = parse(v.birthDate);
+          const asOfText = String(v.asOf ?? '').trim();
+          const asOfDate = asOfText ? parse(asOfText) : (() => { const n = new Date(); return { y: n.getUTCFullYear(), m: n.getUTCMonth() + 1, d: n.getUTCDate() }; })();
+          const asOf = Date.UTC(asOfDate.y, asOfDate.m - 1, asOfDate.d);
+          const daysInMonth = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+          let year = asOfDate.y;
+          let next = Date.UTC(year, birth.m - 1, Math.min(birth.d, daysInMonth(year, birth.m)));
+          if (next < asOf) {
+              year += 1;
+              next = Date.UTC(year, birth.m - 1, Math.min(birth.d, daysInMonth(year, birth.m)));
+          }
+          const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const iso = new Date(next).toISOString().slice(0, 10);
+          return [
+              { label: 'Next birthday', value: iso },
+              { label: 'Days until', value: Math.round((next - asOf) / 86400000), decimals: 0 },
+              { label: 'Age turning', value: year - birth.y, decimals: 0 },
+              { label: 'Weekday', value: weekdays[new Date(next).getUTCDay()] },
+          ];
+  },
+  "zodiac-sign-finder": (v, h) => {
+          const p = String(v.date).split('-').map(Number);
+          if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter a valid date.');
+          const md = p[1] * 100 + p[2];
+          const signs = [
+              [120, 'Capricorn', 'Earth'], [219, 'Aquarius', 'Air'], [320, 'Pisces', 'Water'],
+              [420, 'Aries', 'Fire'], [521, 'Taurus', 'Earth'], [621, 'Gemini', 'Air'],
+              [722, 'Cancer', 'Water'], [823, 'Leo', 'Fire'], [923, 'Virgo', 'Earth'],
+              [1023, 'Libra', 'Air'], [1122, 'Scorpio', 'Water'], [1222, 'Sagittarius', 'Fire'],
+              [1231, 'Capricorn', 'Earth'],
+          ];
+          const sign = signs.find(([limit]) => md <= limit) || signs[signs.length - 1];
+          return [
+              { label: 'Zodiac sign', value: sign[1] },
+              { label: 'Element', value: sign[2] },
+          ];
+  },
+  "chinese-zodiac-finder": (v, h) => {
+          const year = Math.trunc(h.n(v.year));
+          const animals = ['Rat', 'Ox', 'Tiger', 'Rabbit', 'Dragon', 'Snake', 'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
+          const elements = ['Wood', 'Wood', 'Fire', 'Fire', 'Earth', 'Earth', 'Metal', 'Metal', 'Water', 'Water'];
+          const animalIndex = ((year - 4) % 12 + 12) % 12;
+          const elementIndex = ((year - 4) % 10 + 10) % 10;
+          return [
+              { label: 'Animal', value: animals[animalIndex] },
+              { label: 'Element', value: elements[elementIndex] },
+              { label: 'Yin or Yang', value: year % 2 === 0 ? 'Yang' : 'Yin' },
+          ];
+  },
+  "season-finder": (v, h) => {
+          const p = String(v.date).split('-').map(Number);
+          if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter a valid date.');
+          const month = p[1];
+          const northern = month >= 3 && month <= 5 ? 'Spring' : month >= 6 && month <= 8 ? 'Summer' : month >= 9 && month <= 11 ? 'Autumn' : 'Winter';
+          const seasons = { Spring: 'Autumn', Summer: 'Winter', Autumn: 'Spring', Winter: 'Summer' };
+          const dayOfYear = Math.floor((Date.UTC(p[0], p[1] - 1, p[2]) - Date.UTC(p[0], 0, 1)) / 86400000) + 1;
+          return [
+              { label: 'Season', value: v.hemisphere === 'south' ? seasons[northern] : northern },
+              { label: 'Day of year', value: dayOfYear, decimals: 0 },
+          ];
+  },
+  "julian-date-converter": (v, h) => {
+          const p = String(v.date).split('-').map(Number);
+          if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter a valid date.');
+          const [year, month, day] = p;
+          const a = Math.floor((14 - month) / 12);
+          const y = year + 4800 - a;
+          const m = month + 12 * a - 3;
+          const jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+          const dayOfYear = Math.floor((Date.UTC(year, month - 1, day) - Date.UTC(year, 0, 1)) / 86400000) + 1;
+          return [
+              { label: 'Julian day number', value: jdn, decimals: 0 },
+              { label: 'Modified Julian date', value: jdn - 2400000.5 },
+              { label: 'Day of year', value: dayOfYear, decimals: 0 },
+          ];
+  },
+  "moon-phase-calculator": (v, h) => {
+          const p = String(v.date).split('-').map(Number);
+          if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter a valid date.');
+          const [year, month, day] = p;
+          const a = Math.floor((14 - month) / 12);
+          const y = year + 4800 - a;
+          const m = month + 12 * a - 3;
+          const jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+          const synodic = 29.530588853;
+          const age = ((jdn - 2451550.1) % synodic + synodic) % synodic;
+          const illumination = ((1 - Math.cos((2 * Math.PI * age) / synodic)) / 2) * 100;
+          let phase;
+          if (age < 1.845 || age >= 27.685) phase = 'New moon';
+          else if (age < 5.536) phase = 'Waxing crescent';
+          else if (age < 9.228) phase = 'First quarter';
+          else if (age < 12.919) phase = 'Waxing gibbous';
+          else if (age < 16.611) phase = 'Full moon';
+          else if (age < 20.302) phase = 'Waning gibbous';
+          else if (age < 23.993) phase = 'Last quarter';
+          else phase = 'Waning crescent';
+          return [
+              { label: 'Phase', value: phase },
+              { label: 'Illumination', value: illumination, unit: '%' },
+              { label: 'Lunar age', value: age, unit: 'days' },
+          ];
+  },
+  "calendar-generator": (v, h) => {
+          const year = Math.trunc(h.n(v.year));
+          const month = Math.trunc(h.n(v.month));
+          if (month < 1 || month > 12) throw new Error('Month must be between 1 and 12.');
+          const names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+          const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          const first = new Date(Date.UTC(year, month - 1, 1));
+          const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+          const start = first.getUTCDay();
+          const cells = [];
+          for (let i = 0; i < start; i++) cells.push('');
+          for (let d = 1; d <= days; d++) cells.push(String(d));
+          while (cells.length % 7 !== 0) cells.push('');
+          const rows = [];
+          for (let i = 0; i < cells.length; i += 7) {
+              rows.push(cells.slice(i, i + 7).map((c) => c.padStart(2, ' ')).join(' '));
+          }
+          return [
+              { label: 'Month', value: `${names[month - 1]} ${year}` },
+              { label: 'Days', value: days, decimals: 0 },
+              { label: 'First weekday', value: weekdays[start] },
+              { label: 'Calendar', value: ['Su Mo Tu We Th Fr Sa', ...rows].join('\n') },
+          ];
+  },
+  "add-business-days": (v, h) => {
+          const p = String(v.start).split('-').map(Number);
+          if (p.length !== 3 || p.some((x) => !Number.isFinite(x))) throw new Error('Enter a valid start date.');
+          const start = Date.UTC(p[0], p[1] - 1, p[2]);
+          const add = Math.trunc(h.n(v.days));
+          if (add < 0) throw new Error('Business days must be zero or greater.');
+          let current = start;
+          let remaining = add;
+          while (remaining > 0) {
+              current += 86400000;
+              const weekday = new Date(current).getUTCDay();
+              if (weekday !== 0 && weekday !== 6) remaining--;
+          }
+          const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          return [
+              { label: 'Result date', value: new Date(current).toISOString().slice(0, 10) },
+              { label: 'Weekday', value: weekdays[new Date(current).getUTCDay()] },
+              { label: 'Calendar days added', value: Math.round((current - start) / 86400000), decimals: 0 },
+          ];
+  },
+  "time-card-calculator": (v, h) => {
+          const parse = (s) => {
+              const p = String(s).split(':').map(Number);
+              if (p.length < 2 || !Number.isFinite(p[0]) || !Number.isFinite(p[1])) throw new Error('Enter valid times.');
+              return p[0] * 60 + p[1];
+          };
+          let minutes = parse(v.clockOut) - parse(v.clockIn);
+          if (minutes < 0) minutes += 1440;
+          minutes -= Math.max(0, h.n(v.breakMinutes || 0));
+          if (minutes < 0) throw new Error('The break is longer than the shift.');
+          const decimal = minutes / 60;
+          const hours = Math.floor(minutes / 60);
+          const mins = minutes % 60;
+          return [
+              { label: 'Hours worked', value: `${hours}h ${mins}m` },
+              { label: 'Decimal hours', value: decimal },
+              { label: 'Regular hours', value: Math.min(decimal, 8) },
+              { label: 'Overtime hours', value: Math.max(0, decimal - 8) },
           ];
   },
   "age-calculator": (v, h) => {
@@ -465,6 +797,301 @@ export const TOOLS = {
               { label: 'Unix timestamp', value: Math.floor(d.getTime() / 1000), unit: 's', decimals: 0 },
               { label: 'Human-readable date', value: `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}` },
               { label: 'Day of week', value: WEEKDAYS[d.getUTCDay()] },
+          ];
+  },
+  "regex-tester": (v, h) => {
+          const pattern = String(v.pattern ?? '');
+          if (pattern === '') throw new Error('Enter a regular expression.');
+          const flags = String(v.flags ?? 'g');
+          let regex;
+          try {
+              regex = new RegExp(pattern, flags.includes('g') ? flags : flags + 'g');
+          } catch (error) {
+              throw new Error('Invalid regular expression: ' + error.message);
+          }
+          const matches = [...String(v.text ?? '').matchAll(regex)].map((m) => m[0]);
+          return [
+              { label: 'Matches', value: matches.length, decimals: 0 },
+              { label: 'First match', value: matches[0] ?? '—' },
+              { label: 'All matches', value: matches.length ? matches.join(', ') : '—' },
+          ];
+  },
+  "json-validator": (v, h) => {
+          const text = String(v.json ?? '');
+          try {
+              const data = JSON.parse(text);
+              const type = Array.isArray(data) ? 'Array' : data === null ? 'Null' : typeof data === 'object' ? 'Object' : typeof data;
+              const entries = Array.isArray(data) ? data.length : data && typeof data === 'object' ? Object.keys(data).length : 0;
+              return [
+                  { label: 'Valid', value: 'Yes' },
+                  { label: 'Type', value: type },
+                  { label: 'Entries', value: entries, decimals: 0 },
+                  { label: 'Size', value: text.length, decimals: 0 },
+              ];
+          } catch (error) {
+              return [
+                  { label: 'Valid', value: 'No' },
+                  { label: 'Type', value: '—' },
+                  { label: 'Entries', value: 0, decimals: 0 },
+                  { label: 'Error', value: error.message },
+              ];
+          }
+  },
+  "cidr-calculator": (v, h) => {
+          const input = String(v.cidr ?? '').trim();
+          const parts = input.split('/');
+          if (parts.length !== 2) throw new Error('Enter a CIDR block such as 192.168.1.0/24.');
+          const octets = parts[0].split('.').map(Number);
+          if (octets.length !== 4 || octets.some((o) => !Number.isInteger(o) || o < 0 || o > 255)) throw new Error('Enter a valid IPv4 address.');
+          const prefix = Number(parts[1]);
+          if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) throw new Error('The prefix must be between 0 and 32.');
+          const ipToInt = (list) => list.reduce((total, o) => total * 256 + o, 0);
+          const intToIp = (n) => [Math.floor(n / 16777216) % 256, Math.floor(n / 65536) % 256, Math.floor(n / 256) % 256, n % 256].join('.');
+          const ipInt = ipToInt(octets);
+          const mask = prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+          const network = (ipInt & mask) >>> 0;
+          const broadcast = (ipInt | (~mask >>> 0)) >>> 0;
+          const hosts = prefix === 32 ? 1 : prefix === 31 ? 2 : Math.pow(2, 32 - prefix) - 2;
+          return [
+              { label: 'Network', value: intToIp(network) },
+              { label: 'Broadcast', value: intToIp(broadcast) },
+              { label: 'Netmask', value: intToIp(mask) },
+              { label: 'Usable hosts', value: hosts, decimals: 0 },
+              { label: 'First host', value: intToIp(prefix >= 31 ? network : network + 1) },
+              { label: 'Last host', value: intToIp(prefix >= 31 ? broadcast : broadcast - 1) },
+              { label: 'CIDR', value: intToIp(network) + '/' + prefix },
+          ];
+  },
+  "ip-address-info": (v, h) => {
+          const input = String(v.ip ?? '').trim();
+          const octets = input.split('.').map(Number);
+          if (octets.length !== 4 || octets.some((o) => !Number.isInteger(o) || o < 0 || o > 255)) {
+              return [
+                  { label: 'Valid', value: 'No' },
+                  { label: 'Class', value: '—' },
+                  { label: 'Scope', value: '—' },
+                  { label: 'Integer', value: '—' },
+              ];
+          }
+          const first = octets[0];
+          const cls = first < 128 ? 'A' : first < 192 ? 'B' : first < 224 ? 'C' : first < 240 ? 'D' : 'E';
+          let scope = 'Public';
+          if (first === 10 || (first === 172 && octets[1] >= 16 && octets[1] <= 31) || (first === 192 && octets[1] === 168)) scope = 'Private';
+          else if (first === 127) scope = 'Loopback';
+          else if (first === 169 && octets[1] === 254) scope = 'Link-local';
+          else if (first >= 224) scope = 'Multicast / reserved';
+          const integer = octets.reduce((total, o) => total * 256 + o, 0);
+          return [
+              { label: 'Valid', value: 'Yes' },
+              { label: 'Class', value: cls },
+              { label: 'Scope', value: scope },
+              { label: 'Integer', value: integer, decimals: 0 },
+              { label: 'Binary first octet', value: first.toString(2).padStart(8, '0') },
+          ];
+  },
+  "url-parser": (v, h) => {
+          let url;
+          try {
+              url = new URL(String(v.url ?? '').trim());
+          } catch (error) {
+              throw new Error('Enter a valid absolute URL including http:// or https://.');
+          }
+          return [
+              { label: 'Protocol', value: url.protocol },
+              { label: 'Hostname', value: url.hostname },
+              { label: 'Port', value: url.port || '—' },
+              { label: 'Path', value: url.pathname || '/' },
+              { label: 'Query', value: url.search ? url.search.slice(1) : '—' },
+              { label: 'Hash', value: url.hash || '—' },
+              { label: 'Origin', value: url.origin },
+          ];
+  },
+  "query-string-parser": (v, h) => {
+          const raw = String(v.query ?? '').trim().replace(/^\?/, '');
+          const params = new URLSearchParams(raw);
+          const entries = [...params.entries()];
+          return [
+              { label: 'Parameters', value: entries.length, decimals: 0 },
+              { label: 'Keys', value: entries.length ? entries.map(([key]) => key).join(', ') : '—' },
+              { label: 'Decoded', value: entries.length ? entries.map(([key, value]) => `${key}=${value}`).join('\n') : '—' },
+          ];
+  },
+  "html-minifier": (v, h) => {
+          const original = String(v.html ?? '');
+          const minified = original
+              .replace(/<!--[\s\S]*?-->/g, '')
+              .replace(/>\s+</g, '><')
+              .replace(/\s{2,}/g, ' ')
+              .trim();
+          const saved = original.length === 0 ? 0 : ((original.length - minified.length) / original.length) * 100;
+          return [
+              { label: 'Minified', value: minified },
+              { label: 'Original size', value: original.length, decimals: 0 },
+              { label: 'Minified size', value: minified.length, decimals: 0 },
+              { label: 'Saved', value: saved, unit: '%' },
+          ];
+  },
+  "css-minifier": (v, h) => {
+          const original = String(v.css ?? '');
+          let minified = original.replace(/\/\*[\s\S]*?\*\//g, '');
+          minified = minified.replace(/\s+/g, ' ').trim();
+          minified = minified.replace(/\s*([{}:;,>])\s*/g, '$1');
+          minified = minified.replace(/;}/g, '}');
+          const saved = original.length === 0 ? 0 : ((original.length - minified.length) / original.length) * 100;
+          return [
+              { label: 'Minified', value: minified },
+              { label: 'Original size', value: original.length, decimals: 0 },
+              { label: 'Minified size', value: minified.length, decimals: 0 },
+              { label: 'Saved', value: saved, unit: '%' },
+          ];
+  },
+  "uuid-validator": (v, h) => {
+          const input = String(v.uuid ?? '').trim();
+          const valid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(input);
+          if (!valid) {
+              return [
+                  { label: 'Valid', value: 'No' },
+                  { label: 'Version', value: '—' },
+                  { label: 'Variant', value: '—' },
+                  { label: 'Normalised', value: '—' },
+              ];
+          }
+          const normalised = input.toLowerCase();
+          const variantChar = normalised[19];
+          const variant = '89ab'.includes(variantChar) ? 'RFC 4122' : 'cdef'.includes(variantChar) ? 'Microsoft' : 'NCS / reserved';
+          return [
+              { label: 'Valid', value: 'Yes' },
+              { label: 'Version', value: normalised[14] },
+              { label: 'Variant', value: variant },
+              { label: 'Normalised', value: normalised },
+          ];
+  },
+  "email-validator": (v, h) => {
+          const input = String(v.email ?? '').trim();
+          const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input) && !input.includes('..');
+          if (!valid) {
+              return [
+                  { label: 'Valid', value: 'No' },
+                  { label: 'Local part', value: '—' },
+                  { label: 'Domain', value: '—' },
+                  { label: 'TLD', value: '—' },
+              ];
+          }
+          const at = input.lastIndexOf('@');
+          const local = input.slice(0, at);
+          const domain = input.slice(at + 1);
+          const labels = domain.split('.');
+          return [
+              { label: 'Valid', value: 'Yes' },
+              { label: 'Local part', value: local },
+              { label: 'Domain', value: domain },
+              { label: 'TLD', value: labels[labels.length - 1] },
+          ];
+  },
+  "luhn-validator": (v, h) => {
+          const digits = String(v.number ?? '').replace(/[\s-]/g, '');
+          if (!/^\d+$/.test(digits)) throw new Error('Enter digits only (spaces and dashes are allowed).');
+          let sum = 0;
+          let double = false;
+          for (let i = digits.length - 1; i >= 0; i--) {
+              let digit = Number(digits[i]);
+              if (double) {
+                  digit *= 2;
+                  if (digit > 9) digit -= 9;
+              }
+              sum += digit;
+              double = !double;
+          }
+          const valid = digits.length >= 12 && digits.length <= 19 && sum % 10 === 0;
+          let brand = 'Unknown';
+          if (/^3[47]/.test(digits) && digits.length === 15) brand = 'American Express';
+          else if (/^4/.test(digits)) brand = 'Visa';
+          else if (/^(5[1-5]|2(2[2-9]|[3-6]\d|7[01]|720))/.test(digits)) brand = 'Mastercard';
+          else if (/^(6011|65)/.test(digits)) brand = 'Discover';
+          return [
+              { label: 'Valid', value: valid ? 'Yes' : 'No' },
+              { label: 'Brand', value: brand },
+              { label: 'Digits', value: digits.length, decimals: 0 },
+              { label: 'Checksum', value: sum, decimals: 0 },
+          ];
+  },
+  "semver-comparator": (v, h) => {
+          const parse = (value) => {
+              const clean = String(value ?? '').trim().replace(/^v/, '').split('-')[0];
+              const parts = clean.split('.').map((p) => Number(p));
+              if (parts.length < 1 || parts.length > 3 || parts.some((p) => !Number.isInteger(p) || p < 0)) {
+                  throw new Error('Enter a version such as 1.2.3.');
+              }
+              return [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+          };
+          const a = parse(v.a), b = parse(v.b);
+          let comparison = 0;
+          for (let i = 0; i < 3; i++) {
+              if (a[i] !== b[i]) {
+                  comparison = a[i] > b[i] ? 1 : -1;
+                  break;
+              }
+          }
+          return [
+              { label: 'Result', value: comparison === 0 ? 'Equal' : comparison > 0 ? 'A is newer' : 'B is newer' },
+              { label: 'Comparison', value: comparison, decimals: 0 },
+              { label: 'Major difference', value: a[0] - b[0], decimals: 0 },
+              { label: 'Minor difference', value: a[1] - b[1], decimals: 0 },
+              { label: 'Patch difference', value: a[2] - b[2], decimals: 0 },
+          ];
+  },
+  "http-status-lookup": (v, h) => {
+          const code = Math.trunc(h.n(v.code));
+          const statuses = {
+              100: ['Continue', 'The server received the request headers and the client should proceed.'],
+              200: ['OK', 'The request succeeded and the response contains the result.'],
+              201: ['Created', 'The request succeeded and a new resource was created.'],
+              204: ['No Content', 'The request succeeded but there is no response body.'],
+              301: ['Moved Permanently', 'The resource has permanently moved to a new URL.'],
+              302: ['Found', 'The resource is temporarily available at another URL.'],
+              304: ['Not Modified', 'The cached copy is still valid.'],
+              400: ['Bad Request', 'The server cannot process the request because it is malformed.'],
+              401: ['Unauthorized', 'Authentication is required and was not provided.'],
+              403: ['Forbidden', 'The server understood the request but refuses to authorise it.'],
+              404: ['Not Found', 'The requested resource could not be found.'],
+              405: ['Method Not Allowed', 'The HTTP method is not supported for this resource.'],
+              409: ['Conflict', 'The request conflicts with the current state of the resource.'],
+              422: ['Unprocessable Content', 'The request is well formed but fails validation.'],
+              429: ['Too Many Requests', 'The client has sent too many requests in a given time.'],
+              500: ['Internal Server Error', 'The server encountered an unexpected condition.'],
+              502: ['Bad Gateway', 'An upstream server returned an invalid response.'],
+              503: ['Service Unavailable', 'The server is temporarily unable to handle the request.'],
+              504: ['Gateway Timeout', 'An upstream server did not respond in time.'],
+          };
+          const category = code < 200 ? 'Informational' : code < 300 ? 'Success' : code < 400 ? 'Redirection' : code < 500 ? 'Client error' : 'Server error';
+          const entry = statuses[code];
+          return [
+              { label: 'Code', value: code, decimals: 0 },
+              { label: 'Name', value: entry ? entry[0] : 'Unknown status' },
+              { label: 'Category', value: category },
+              { label: 'Description', value: entry ? entry[1] : 'No standard description is available for this code.' },
+          ];
+  },
+  "color-contrast-checker": (v, h) => {
+          const expand = (value) => {
+              const hex = String(value ?? '').trim().replace(/^#/, '');
+              if (/^[0-9a-f]{3}$/i.test(hex)) return hex.split('').map((c) => c + c).join('');
+              if (/^[0-9a-f]{6}$/i.test(hex)) return hex;
+              throw new Error('Enter a hex colour such as #000000.');
+          };
+          const luminance = (hex) => {
+              const channels = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
+              return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+          };
+          const l1 = luminance(expand(v.foreground));
+          const l2 = luminance(expand(v.background));
+          const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+          return [
+              { label: 'Contrast ratio', value: ratio, decimals: 2 },
+              { label: 'AA normal text', value: ratio >= 4.5 ? 'Pass' : 'Fail' },
+              { label: 'AA large text', value: ratio >= 3 ? 'Pass' : 'Fail' },
+              { label: 'AAA normal text', value: ratio >= 7 ? 'Pass' : 'Fail' },
+              { label: 'AA interface', value: ratio >= 3 ? 'Pass' : 'Fail' },
           ];
   },
   "base64-encoder-decoder": (v, h) => {
@@ -915,6 +1542,171 @@ export const TOOLS = {
               { label: 'Digit count', value: raw.length, decimals: 0 },
           ];
   },
+  "cgpa-calculator": (v, h) => {
+          const lines = String(v.courses ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+          if (lines.length === 0) throw new Error('Enter at least one course.');
+          let points = 0;
+          let credits = 0;
+          let counted = 0;
+          for (const line of lines) {
+              const numbers = (line.match(/\d+(?:\.\d+)?/g) || []).map(Number);
+              if (numbers.length < 2) throw new Error('Each line needs a grade point and credits: ' + line);
+              const grade = numbers[0];
+              const credit = numbers[1];
+              if (grade < 0 || grade > 5) throw new Error('Grade points must be between 0 and 5: ' + line);
+              if (credit <= 0) throw new Error('Credits must be greater than zero: ' + line);
+              points += grade * credit;
+              credits += credit;
+              counted++;
+          }
+          return [
+              { label: 'CGPA', value: points / credits },
+              { label: 'Total credits', value: credits, decimals: 0 },
+              { label: 'Courses', value: counted, decimals: 0 },
+              { label: 'Total grade points', value: points },
+          ];
+  },
+  "attendance-calculator": (v, h) => {
+          const attended = Math.trunc(h.n(v.attended));
+          const total = Math.trunc(h.n(v.total));
+          const target = h.n(v.target);
+          if (attended < 0 || total <= 0) throw new Error('Enter a positive number of classes.');
+          if (attended > total) throw new Error('Attended classes cannot exceed classes held.');
+          if (target < 0 || target > 100) throw new Error('The target must be between 0 and 100 percent.');
+          const current = (attended / total) * 100;
+          const needed = target >= 100
+              ? (attended === total ? 0 : null)
+              : Math.max(0, Math.ceil((target * total - 100 * attended) / (100 - target) - 1e-9));
+          const canSkip = target === 0 ? 0 : Math.max(0, Math.floor((attended * 100) / target - total));
+          return [
+              { label: 'Attendance', value: current, unit: '%' },
+              { label: 'Absences', value: total - attended, decimals: 0 },
+              { label: 'Classes needed', value: needed === null ? 'Not reachable' : needed, decimals: 0 },
+              { label: 'Classes you can skip', value: canSkip, decimals: 0 },
+          ];
+  },
+  "quiz-score-calculator": (v, h) => {
+          const correct = Math.trunc(h.n(v.correct)), wrong = Math.trunc(h.n(v.wrong));
+          const points = h.n(v.points), penalty = h.n(v.penalty || 0);
+          if (correct < 0 || wrong < 0 || points < 0 || penalty < 0) throw new Error('Values cannot be negative.');
+          const questions = correct + wrong;
+          if (questions === 0) throw new Error('Enter at least one answer.');
+          const possible = questions * points;
+          const score = correct * points - wrong * penalty;
+          return [
+              { label: 'Score', value: score },
+              { label: 'Possible score', value: possible },
+              { label: 'Percentage', value: possible === 0 ? 0 : (score / possible) * 100, unit: '%' },
+              { label: 'Questions', value: questions, decimals: 0 },
+          ];
+  },
+  "letter-grade-calculator": (v, h) => {
+          const score = h.n(v.percentage);
+          if (score < 0 || score > 100) throw new Error('Enter a percentage between 0 and 100.');
+          const scale = [
+              [97, 'A+', 4.0], [93, 'A', 4.0], [90, 'A-', 3.7], [87, 'B+', 3.3],
+              [83, 'B', 3.0], [80, 'B-', 2.7], [77, 'C+', 2.3], [73, 'C', 2.0],
+              [70, 'C-', 1.7], [67, 'D+', 1.3], [63, 'D', 1.0], [60, 'D-', 0.7],
+          ];
+          const match = scale.find(([minimum]) => score >= minimum);
+          const letter = match ? match[1] : 'F';
+          const points = match ? match[2] : 0;
+          return [
+              { label: 'Letter grade', value: letter },
+              { label: 'Grade points', value: points },
+              { label: 'Status', value: score >= 60 ? 'Pass' : 'Fail' },
+              { label: 'Percentage', value: score, unit: '%' },
+          ];
+  },
+  "study-time-planner": (v, h) => {
+          const topics = Math.trunc(h.n(v.topics)), minutes = h.n(v.minutes), days = Math.trunc(h.n(v.days));
+          if (topics <= 0 || minutes <= 0 || days <= 0) throw new Error('All values must be greater than zero.');
+          const total = topics * minutes;
+          return [
+              { label: 'Total study time', value: total, unit: 'min' },
+              { label: 'Minutes per day', value: total / days, unit: 'min' },
+              { label: 'Hours in total', value: total / 60 },
+              { label: 'Hours per day', value: total / days / 60 },
+          ];
+  },
+  "significant-figures-counter": (v, h) => {
+          const raw = String(v.number ?? '').trim();
+          if (raw === '' || !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(raw)) throw new Error('Enter a valid number.');
+          const mantissa = raw.replace(/^[+-]/, '').split(/e/i)[0];
+          const hasDecimal = mantissa.includes('.');
+          let digits = mantissa.replace('.', '');
+          if (!/\d/.test(digits)) throw new Error('Enter a number containing digits.');
+          digits = digits.replace(/^0+/, '');
+          if (digits === '') {
+              return [
+                  { label: 'Significant figures', value: 1, decimals: 0 },
+                  { label: 'Digits', value: 1, decimals: 0 },
+                  { label: 'Decimal point', value: hasDecimal ? 'Yes' : 'No' },
+              ];
+          }
+          if (!hasDecimal) digits = digits.replace(/0+$/, '');
+          return [
+              { label: 'Significant figures', value: digits.length, decimals: 0 },
+              { label: 'Digits', value: digits.length, decimals: 0 },
+              { label: 'Decimal point', value: hasDecimal ? 'Yes' : 'No' },
+          ];
+  },
+  "number-to-words": (v, h) => {
+          const input = Math.trunc(h.n(v.number));
+          const ones = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+          const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+          const under1000 = (n) => {
+              const parts = [];
+              if (n >= 100) {
+                  parts.push(ones[Math.floor(n / 100)] + ' hundred');
+                  n %= 100;
+              }
+              if (n >= 20) {
+                  const t = tens[Math.floor(n / 10)];
+                  const r = n % 10;
+                  parts.push(r ? `${t}-${ones[r]}` : t);
+              } else if (n > 0) {
+                  parts.push(ones[n]);
+              }
+              return parts.join(' ');
+          };
+          const scales = ['', 'thousand', 'million', 'billion'];
+          let value = Math.abs(input);
+          if (value === 0) return [{ label: 'Words', value: 'zero' }, { label: 'Digits', value: 1, decimals: 0 }];
+          const groups = [];
+          let index = 0;
+          while (value > 0 && index < scales.length) {
+              const chunk = value % 1000;
+              if (chunk > 0) {
+                  const words = under1000(chunk);
+                  groups.unshift(scales[index] ? `${words} ${scales[index]}` : words);
+              }
+              value = Math.floor(value / 1000);
+              index++;
+          }
+          const words = (input < 0 ? 'minus ' : '') + groups.join(' ');
+          return [
+              { label: 'Words', value: words },
+              { label: 'Digits', value: String(Math.abs(input)).length, decimals: 0 },
+          ];
+  },
+  "citation-generator": (v, h) => {
+          const author = String(v.author ?? '').trim();
+          const title = String(v.title ?? '').trim();
+          const source = String(v.source ?? '').trim();
+          const url = String(v.url ?? '').trim();
+          const year = Math.trunc(h.n(v.year));
+          if (!author || !title || !source) throw new Error('Author, title and source are required.');
+          const suffix = url ? ' ' + url : '';
+          const citation = v.style === 'mla'
+              ? `${author}. "${title}." ${source}, ${year}.${suffix}`
+              : `${author}. (${year}). ${title}. ${source}.${suffix}`;
+          return [
+              { label: 'Citation', value: citation },
+              { label: 'Style', value: v.style === 'mla' ? 'MLA' : 'APA' },
+              { label: 'Year', value: year, decimals: 0 },
+          ];
+  },
   "gpa-calculator": (v, h) => {
           const lines = h.splitLines(v.courses);
           if (lines.length === 0) throw new Error('Enter at least one course line.');
@@ -1143,6 +1935,84 @@ export const TOOLS = {
               { label: 'Decimal value', value: num / den, decimals: 10 },
           ];
   },
+  "recipe-scaler": (v, h) => {
+          const original = h.n(v.original), desired = h.n(v.desired), amount = h.n(v.amount);
+          if (original <= 0 || desired <= 0) throw new Error('Servings must be greater than zero.');
+          if (amount < 0) throw new Error('The ingredient amount cannot be negative.');
+          const factor = desired / original;
+          return [
+              { label: 'Scaled amount', value: amount * factor },
+              { label: 'Scale factor', value: factor, unit: '×' },
+              { label: 'Original amount', value: amount },
+              { label: 'Servings', value: desired },
+          ];
+  },
+  "rent-split-calculator": (v, h) => {
+          const rent = h.n(v.rent), income1 = h.n(v.income1), income2 = h.n(v.income2);
+          if (rent < 0) throw new Error('Rent cannot be negative.');
+          if (income1 < 0 || income2 < 0) throw new Error('Incomes cannot be negative.');
+          const total = income1 + income2;
+          if (total <= 0) throw new Error('At least one income must be greater than zero.');
+          const share1 = (rent * income1) / total;
+          return [
+              { label: 'Person 1 pays', value: share1 },
+              { label: 'Person 2 pays', value: rent - share1 },
+              { label: 'Person 1 share', value: (income1 / total) * 100, unit: '%' },
+              { label: 'Person 2 share', value: (income2 / total) * 100, unit: '%' },
+          ];
+  },
+  "pizza-size-comparator": (v, h) => {
+          const d1 = h.n(v.diameter1), p1 = h.n(v.price1), d2 = h.n(v.diameter2), p2 = h.n(v.price2);
+          if (d1 <= 0 || d2 <= 0) throw new Error('Diameters must be greater than zero.');
+          if (p1 <= 0 || p2 <= 0) throw new Error('Prices must be greater than zero.');
+          const area1 = Math.PI * (d1 / 2) ** 2;
+          const area2 = Math.PI * (d2 / 2) ** 2;
+          const perArea1 = p1 / area1;
+          const perArea2 = p2 / area2;
+          return [
+              { label: 'Pizza A area', value: area1, unit: 'in²' },
+              { label: 'Pizza B area', value: area2, unit: 'in²' },
+              { label: 'Size difference', value: ((area2 - area1) / area1) * 100, unit: '%' },
+              { label: 'Pizza A price per area', value: perArea1 },
+              { label: 'Pizza B price per area', value: perArea2 },
+              { label: 'Better value', value: perArea1 === perArea2 ? 'Equal' : perArea1 < perArea2 ? 'Pizza A' : 'Pizza B' },
+          ];
+  },
+  "aquarium-volume-calculator": (v, h) => {
+          const length = h.n(v.length), width = h.n(v.width), height = h.n(v.height);
+          if (length <= 0 || width <= 0 || height <= 0) throw new Error('All dimensions must be greater than zero.');
+          const litres = (length * width * height) / 1000;
+          return [
+              { label: 'Volume', value: litres, unit: 'L' },
+              { label: 'US gallons', value: litres / 3.785411784, unit: 'gal' },
+              { label: 'Imperial gallons', value: litres / 4.54609, unit: 'gal' },
+              { label: 'Water weight', value: litres, unit: 'kg' },
+          ];
+  },
+  "coffee-ratio-calculator": (v, h) => {
+          const coffee = h.n(v.coffee), ratio = h.n(v.ratio);
+          if (coffee < 0) throw new Error('Coffee cannot be negative.');
+          if (ratio <= 0) throw new Error('The ratio must be greater than zero.');
+          const water = coffee * ratio;
+          return [
+              { label: 'Water', value: water, unit: 'ml' },
+              { label: 'Coffee', value: coffee, unit: 'g' },
+              { label: 'Ratio', value: `1:${ratio}` },
+              { label: 'Cups (240 ml)', value: water / 240 },
+          ];
+  },
+  "subscription-cost-calculator": (v, h) => {
+          const price = h.n(v.price), count = Math.trunc(h.n(v.count)), years = h.n(v.years);
+          if (price < 0 || years < 0) throw new Error('Values cannot be negative.');
+          if (count <= 0) throw new Error('Enter at least one subscription.');
+          const monthly = price * count;
+          return [
+              { label: 'Monthly total', value: monthly },
+              { label: 'Annual total', value: monthly * 12 },
+              { label: 'Total over period', value: monthly * 12 * years },
+              { label: 'Subscriptions', value: count, decimals: 0 },
+          ];
+  },
   "fuel-cost-calculator": (v, h) => {
           const distance = h.n(v.distance);
           const efficiency = h.n(v.efficiency);
@@ -1319,6 +2189,181 @@ export const TOOLS = {
               { label: 'Price per unit (A)', value: unit1, unit: `per ${unitLabel}`, decimals: 6 },
               { label: 'Price per unit (B)', value: unit2, unit: `per ${unitLabel}`, decimals: 6 },
               { label: 'Better value', value: better },
+          ];
+  },
+  "debt-to-income-calculator": (v, h) => {
+          const debt = h.n(v.debt), income = h.n(v.income);
+          if (debt < 0) throw new Error('Debt payments cannot be negative.');
+          if (income <= 0) throw new Error('Income must be greater than zero.');
+          const dti = (debt / income) * 100;
+          const status = dti <= 20 ? 'Excellent' : dti <= 36 ? 'Good' : dti <= 43 ? 'Manageable' : 'High';
+          return [
+              { label: 'Debt-to-income ratio', value: dti, unit: '%' },
+              { label: 'Status', value: status },
+              { label: 'Recommended maximum debt', value: income * 0.36 },
+              { label: 'Remaining income', value: income - debt },
+          ];
+  },
+  "cagr-calculator": (v, h) => {
+          const begin = h.n(v.begin), end = h.n(v.end), years = h.n(v.years);
+          if (begin <= 0) throw new Error('The starting value must be greater than zero.');
+          if (end < 0) throw new Error('The ending value cannot be negative.');
+          if (years <= 0) throw new Error('Years must be greater than zero.');
+          const cagr = (Math.pow(end / begin, 1 / years) - 1) * 100;
+          return [
+              { label: 'CAGR', value: cagr, unit: '%' },
+              { label: 'Total growth', value: ((end - begin) / begin) * 100, unit: '%' },
+              { label: 'Multiple', value: end / begin, unit: '×' },
+          ];
+  },
+  "dividend-yield-calculator": (v, h) => {
+          const dividend = h.n(v.dividend), price = h.n(v.price), shares = Math.trunc(h.n(v.shares));
+          if (dividend < 0 || price < 0 || shares < 0) throw new Error('Values cannot be negative.');
+          if (price <= 0) throw new Error('The share price must be greater than zero.');
+          const annualIncome = dividend * shares;
+          return [
+              { label: 'Dividend yield', value: (dividend / price) * 100, unit: '%' },
+              { label: 'Annual income', value: annualIncome },
+              { label: 'Quarterly income', value: annualIncome / 4 },
+              { label: 'Holding value', value: price * shares },
+          ];
+  },
+  "future-value-calculator": (v, h) => {
+          const present = h.n(v.present), rate = h.n(v.rate) / 100, years = h.n(v.years), compounds = Math.max(1, Math.trunc(h.n(v.compounds)));
+          if (present < 0) throw new Error('The present value cannot be negative.');
+          const future = present * Math.pow(1 + rate / compounds, compounds * years);
+          return [
+              { label: 'Future value', value: future },
+              { label: 'Interest earned', value: future - present },
+              { label: 'Growth', value: present === 0 ? 0 : ((future - present) / present) * 100, unit: '%' },
+          ];
+  },
+  "present-value-calculator": (v, h) => {
+          const future = h.n(v.future), rate = h.n(v.rate) / 100, years = h.n(v.years), compounds = Math.max(1, Math.trunc(h.n(v.compounds)));
+          if (future < 0) throw new Error('The future value cannot be negative.');
+          const present = future / Math.pow(1 + rate / compounds, compounds * years);
+          return [
+              { label: 'Present value', value: present },
+              { label: 'Discount amount', value: future - present },
+              { label: 'Discount rate', value: future === 0 ? 0 : ((future - present) / future) * 100, unit: '%' },
+          ];
+  },
+  "debt-payoff-calculator": (v, h) => {
+          let balance = h.n(v.balance);
+          const apr = h.n(v.apr), payment = h.n(v.payment);
+          if (balance < 0 || apr < 0) throw new Error('Balance and interest rate cannot be negative.');
+          if (payment <= 0) throw new Error('The monthly payment must be greater than zero.');
+          const rate = apr / 100 / 12;
+          if (payment <= balance * rate) throw new Error('The payment does not cover the monthly interest.');
+          let months = 0;
+          let interest = 0;
+          while (balance > 0 && months < 1200) {
+              const charged = balance * rate;
+              let principal = payment - charged;
+              if (principal > balance) principal = balance;
+              balance -= principal;
+              interest += charged;
+              months++;
+          }
+          return [
+              { label: 'Months to payoff', value: months, decimals: 0 },
+              { label: 'Years to payoff', value: months / 12 },
+              { label: 'Total interest', value: interest },
+              { label: 'Total paid', value: interest + h.n(v.balance) },
+          ];
+  },
+  "sales-tax-calculator": (v, h) => {
+          const amount = h.n(v.amount), rate = h.n(v.rate) / 100;
+          if (amount < 0 || rate < 0) throw new Error('Amount and rate cannot be negative.');
+          if (v.mode === 'gross') {
+              const net = amount / (1 + rate);
+              return [
+                  { label: 'Net price', value: net },
+                  { label: 'Tax', value: amount - net },
+                  { label: 'Gross price', value: amount },
+              ];
+          }
+          const tax = amount * rate;
+          return [
+              { label: 'Net price', value: amount },
+              { label: 'Tax', value: tax },
+              { label: 'Gross price', value: amount + tax },
+          ];
+  },
+  "loan-to-value-calculator": (v, h) => {
+          const loan = h.n(v.loan), value = h.n(v.value);
+          if (loan < 0) throw new Error('The loan amount cannot be negative.');
+          if (value <= 0) throw new Error('The property value must be greater than zero.');
+          const ltv = (loan / value) * 100;
+          const equity = value - loan;
+          return [
+              { label: 'Loan-to-value', value: ltv, unit: '%' },
+              { label: 'Equity', value: equity },
+              { label: 'Equity share', value: (equity / value) * 100, unit: '%' },
+              { label: 'Status', value: ltv <= 80 ? 'Standard' : ltv <= 90 ? 'Higher risk' : 'High risk' },
+          ];
+  },
+  "credit-utilization-calculator": (v, h) => {
+          const balance = h.n(v.balance), limit = h.n(v.limit);
+          if (balance < 0) throw new Error('Balances cannot be negative.');
+          if (limit <= 0) throw new Error('The credit limit must be greater than zero.');
+          const utilization = (balance / limit) * 100;
+          return [
+              { label: 'Utilisation', value: utilization, unit: '%' },
+              { label: 'Available credit', value: Math.max(0, limit - balance) },
+              { label: 'Status', value: utilization <= 30 ? 'Good' : utilization <= 50 ? 'Fair' : 'High' },
+              { label: 'Balance to reach 30%', value: Math.max(0, limit * 0.3 - balance) },
+          ];
+  },
+  "mortgage-calculator": (v, h) => {
+          const price = h.n(v.price), downPercent = h.n(v.down), rate = h.n(v.rate), years = h.n(v.years);
+          if (price <= 0) throw new Error('Home price must be greater than zero.');
+          if (downPercent < 0 || downPercent >= 100) throw new Error('Down payment must be between 0 and 100 percent.');
+          if (rate < 0) throw new Error('Interest rate cannot be negative.');
+          if (years <= 0) throw new Error('Loan term must be greater than zero.');
+          const downPayment = (price * downPercent) / 100;
+          const loan = price - downPayment;
+          const months = years * 12;
+          const monthlyRate = rate / 100 / 12;
+          const monthly = monthlyRate === 0 ? loan / months : (loan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
+          const totalPaid = monthly * months;
+          return [
+              { label: 'Monthly payment', value: monthly },
+              { label: 'Loan amount', value: loan },
+              { label: 'Down payment', value: downPayment },
+              { label: 'Total interest', value: totalPaid - loan },
+              { label: 'Total cost', value: totalPaid + downPayment },
+          ];
+  },
+  "emergency-fund-calculator": (v, h) => {
+          const expenses = h.n(v.expenses), months = Math.max(1, Math.trunc(h.n(v.months)));
+          const current = h.n(v.current || 0), monthly = h.n(v.monthly || 0);
+          if (expenses < 0 || current < 0 || monthly < 0) throw new Error('Values cannot be negative.');
+          const target = expenses * months;
+          const shortfall = Math.max(0, target - current);
+          const monthsToGoal = shortfall === 0 ? 0 : monthly > 0 ? Math.ceil(shortfall / monthly) : null;
+          return [
+              { label: 'Target', value: target },
+              { label: 'Shortfall', value: shortfall },
+              { label: 'Months to goal', value: monthsToGoal === null ? 'Set a monthly saving' : monthsToGoal, decimals: 0 },
+              { label: 'Progress', value: target === 0 ? 100 : Math.min(100, (current / target) * 100), unit: '%' },
+          ];
+  },
+  "stock-profit-calculator": (v, h) => {
+          const buy = h.n(v.buy), sell = h.n(v.sell), shares = Math.trunc(h.n(v.shares)), commission = h.n(v.commission || 0);
+          if (buy < 0 || sell < 0) throw new Error('Prices cannot be negative.');
+          if (shares <= 0) throw new Error('Shares must be greater than zero.');
+          if (commission < 0) throw new Error('Commission cannot be negative.');
+          const cost = buy * shares + commission;
+          const proceeds = sell * shares - commission;
+          const profit = proceeds - cost;
+          const roi = cost === 0 ? 0 : (profit / cost) * 100;
+          return [
+              { label: 'Profit', value: profit },
+              { label: 'Total cost', value: cost },
+              { label: 'Total proceeds', value: proceeds },
+              { label: 'ROI', value: roi, unit: '%' },
+              { label: 'Break-even price', value: shares === 0 ? 0 : cost / shares },
           ];
   },
   "loan-payment-calculator": (v, h) => {
@@ -1548,6 +2593,185 @@ export const TOOLS = {
               { label: 'Gross profit', value: profit },
               { label: 'Profit margin', value: (profit / revenue) * 100, unit: '%' },
               { label: 'Markup', value: cost === 0 ? '—' : (profit / cost) * 100, unit: cost === 0 ? '' : '%' },
+          ];
+  },
+  "standard-deviation-calculator": (v, h) => {
+          const nums = (String(v.numbers).match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi) || []).map(Number).filter(Number.isFinite);
+          if (nums.length === 0) throw new Error('Enter at least one number.');
+          const n = nums.length;
+          const mean = nums.reduce((a, b) => a + b, 0) / n;
+          const sumSq = nums.reduce((total, x) => total + (x - mean) ** 2, 0);
+          const divisor = v.mode === 'population' ? n : Math.max(1, n - 1);
+          const variance = sumSq / divisor;
+          return [
+              { label: 'Mean', value: mean },
+              { label: 'Variance', value: variance },
+              { label: 'Standard deviation', value: Math.sqrt(variance) },
+              { label: 'Count', value: n, decimals: 0 },
+          ];
+  },
+  "median-calculator": (v, h) => {
+          const nums = (String(v.numbers).match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi) || []).map(Number).filter(Number.isFinite);
+          if (nums.length === 0) throw new Error('Enter at least one number.');
+          const sorted = [...nums].sort((a, b) => a - b);
+          const medianOf = (arr) => {
+              if (arr.length === 0) return sorted[0];
+              const m = Math.floor(arr.length / 2);
+              return arr.length % 2 ? arr[m] : (arr[m - 1] + arr[m]) / 2;
+          };
+          const mid = Math.floor(sorted.length / 2);
+          const lower = sorted.length % 2 ? sorted.slice(0, mid) : sorted.slice(0, mid);
+          const upper = sorted.length % 2 ? sorted.slice(mid + 1) : sorted.slice(mid);
+          return [
+              { label: 'Median', value: medianOf(sorted) },
+              { label: 'First quartile', value: medianOf(lower) },
+              { label: 'Third quartile', value: medianOf(upper) },
+              { label: 'Range', value: sorted[sorted.length - 1] - sorted[0] },
+              { label: 'Count', value: sorted.length, decimals: 0 },
+          ];
+  },
+  "mode-calculator": (v, h) => {
+          const nums = (String(v.numbers).match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi) || []).map(Number).filter(Number.isFinite);
+          if (nums.length === 0) throw new Error('Enter at least one number.');
+          const counts = new Map();
+          for (const n of nums) counts.set(n, (counts.get(n) || 0) + 1);
+          const max = Math.max(...counts.values());
+          const modes = [...counts.entries()].filter(([, c]) => c === max).map(([n]) => n).sort((a, b) => a - b);
+          return [
+              { label: 'Mode', value: max === 1 ? 'No mode' : modes.join(', ') },
+              { label: 'Frequency', value: max, decimals: 0 },
+              { label: 'Unique values', value: counts.size, decimals: 0 },
+              { label: 'Count', value: nums.length, decimals: 0 },
+          ];
+  },
+  "percentile-calculator": (v, h) => {
+          const nums = (String(v.numbers).match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi) || []).map(Number).filter(Number.isFinite);
+          if (nums.length === 0) throw new Error('Enter at least one number.');
+          const p = h.clamp(h.n(v.percentile), 0, 100);
+          const sorted = [...nums].sort((a, b) => a - b);
+          const rank = Math.max(1, Math.ceil((p / 100) * sorted.length));
+          return [
+              { label: 'Percentile value', value: sorted[rank - 1] },
+              { label: 'Rank', value: rank, decimals: 0 },
+              { label: 'Percentile', value: p, unit: '%' },
+              { label: 'Count', value: sorted.length, decimals: 0 },
+          ];
+  },
+  "z-score-calculator": (v, h) => {
+          const value = h.n(v.value), mean = h.n(v.mean), sd = h.n(v.sd);
+          if (sd <= 0) throw new Error('Standard deviation must be greater than zero.');
+          const z = (value - mean) / sd;
+          return [
+              { label: 'Z-score', value: z },
+              { label: 'Distance from mean', value: Math.abs(value - mean) },
+              { label: 'Position', value: z === 0 ? 'At the mean' : z > 0 ? 'Above the mean' : 'Below the mean' },
+          ];
+  },
+  "slope-calculator": (v, h) => {
+          const x1 = h.n(v.x1), y1 = h.n(v.y1), x2 = h.n(v.x2), y2 = h.n(v.y2);
+          const dx = x2 - x1, dy = y2 - y1;
+          const distance = Math.hypot(dx, dy);
+          if (dx === 0) {
+              return [
+                  { label: 'Slope', value: 'Undefined' },
+                  { label: 'Y-intercept', value: '—' },
+                  { label: 'Angle', value: 90, unit: '°' },
+                  { label: 'Distance', value: distance },
+              ];
+          }
+          const slope = dy / dx;
+          return [
+              { label: 'Slope', value: slope },
+              { label: 'Y-intercept', value: y1 - slope * x1 },
+              { label: 'Angle', value: Math.atan(slope) * 180 / Math.PI, unit: '°' },
+              { label: 'Distance', value: distance },
+          ];
+  },
+  "midpoint-calculator": (v, h) => {
+          const x1 = h.n(v.x1), y1 = h.n(v.y1), x2 = h.n(v.x2), y2 = h.n(v.y2);
+          return [
+              { label: 'Midpoint x', value: (x1 + x2) / 2 },
+              { label: 'Midpoint y', value: (y1 + y2) / 2 },
+              { label: 'Distance', value: Math.hypot(x2 - x1, y2 - y1) },
+          ];
+  },
+  "pythagorean-theorem-calculator": (v, h) => {
+          const a = h.n(v.a), b = h.n(v.b);
+          if (a <= 0 || b <= 0) throw new Error('Sides must be greater than zero.');
+          let missing;
+          let legA = a, legB = b;
+          if (v.mode === 'leg') {
+              if (a <= b) throw new Error('The hypotenuse must be longer than the known leg.');
+              missing = Math.sqrt(a * a - b * b);
+              legA = missing;
+              legB = b;
+          } else {
+              missing = Math.hypot(a, b);
+              legA = a;
+              legB = b;
+          }
+          return [
+              { label: 'Missing side', value: missing },
+              { label: 'Area', value: (legA * legB) / 2 },
+              { label: 'Perimeter', value: legA + legB + Math.hypot(legA, legB) },
+          ];
+  },
+  "rectangle-calculator": (v, h) => {
+          const length = h.n(v.length), width = h.n(v.width);
+          if (length <= 0 || width <= 0) throw new Error('Length and width must be greater than zero.');
+          return [
+              { label: 'Area', value: length * width },
+              { label: 'Perimeter', value: 2 * (length + width) },
+              { label: 'Diagonal', value: Math.hypot(length, width) },
+          ];
+  },
+  "trapezoid-area-calculator": (v, h) => {
+          const a = h.n(v.a), b = h.n(v.b), height = h.n(v.height);
+          if (a <= 0 || b <= 0 || height <= 0) throw new Error('All lengths must be greater than zero.');
+          return [
+              { label: 'Area', value: ((a + b) / 2) * height },
+              { label: 'Average width', value: (a + b) / 2 },
+          ];
+  },
+  "sphere-calculator": (v, h) => {
+          const r = h.n(v.radius);
+          if (r <= 0) throw new Error('Radius must be greater than zero.');
+          return [
+              { label: 'Volume', value: (4 / 3) * Math.PI * r ** 3 },
+              { label: 'Surface area', value: 4 * Math.PI * r ** 2 },
+              { label: 'Diameter', value: 2 * r },
+              { label: 'Circumference', value: 2 * Math.PI * r },
+          ];
+  },
+  "cylinder-calculator": (v, h) => {
+          const r = h.n(v.radius), height = h.n(v.height);
+          if (r <= 0 || height <= 0) throw new Error('Radius and height must be greater than zero.');
+          return [
+              { label: 'Volume', value: Math.PI * r ** 2 * height },
+              { label: 'Surface area', value: 2 * Math.PI * r * (r + height) },
+              { label: 'Lateral area', value: 2 * Math.PI * r * height },
+              { label: 'Base area', value: Math.PI * r ** 2 },
+          ];
+  },
+  "cone-calculator": (v, h) => {
+          const r = h.n(v.radius), height = h.n(v.height);
+          if (r <= 0 || height <= 0) throw new Error('Radius and height must be greater than zero.');
+          const slant = Math.hypot(r, height);
+          return [
+              { label: 'Volume', value: (Math.PI * r ** 2 * height) / 3 },
+              { label: 'Slant height', value: slant },
+              { label: 'Surface area', value: Math.PI * r * (r + slant) },
+              { label: 'Lateral area', value: Math.PI * r * slant },
+          ];
+  },
+  "logarithm-calculator": (v, h) => {
+          const x = h.n(v.x), base = h.n(v.base);
+          if (x <= 0) throw new Error('The number must be greater than zero.');
+          if (base <= 0 || base === 1) throw new Error('The base must be greater than zero and not equal to one.');
+          return [
+              { label: 'Logarithm', value: Math.log(x) / Math.log(base) },
+              { label: 'Natural log', value: Math.log(x) },
+              { label: 'Log base 10', value: Math.log10(x) },
           ];
   },
   "percentage-calculator": (v, h) => {
@@ -1794,6 +3018,195 @@ export const TOOLS = {
           const rounded = v.mode === 'up' ? Math.ceil(scaled) : v.mode === 'down' ? Math.floor(scaled) : Math.round(scaled);
           return { label: 'Rounded value', value: rounded / factor, decimals };
   },
+  "acceleration-calculator": (v, h) => {
+          const u = h.n(v.u), finalV = h.n(v.v), t = h.n(v.t);
+          if (t <= 0) throw new Error('Time must be greater than zero.');
+          return [
+              { label: 'Acceleration', value: (finalV - u) / t, unit: 'm/s²' },
+              { label: 'Distance', value: ((u + finalV) / 2) * t, unit: 'm' },
+              { label: 'Average velocity', value: (u + finalV) / 2, unit: 'm/s' },
+          ];
+  },
+  "kinetic-energy-calculator": (v, h) => {
+          const mass = h.n(v.mass), velocity = h.n(v.velocity);
+          const energy = 0.5 * mass * velocity ** 2;
+          return [
+              { label: 'Kinetic energy', value: energy, unit: 'J' },
+              { label: 'Kinetic energy (kJ)', value: energy / 1000, unit: 'kJ' },
+              { label: 'Momentum', value: mass * velocity, unit: 'kg·m/s' },
+          ];
+  },
+  "potential-energy-calculator": (v, h) => {
+          const mass = h.n(v.mass), height = h.n(v.height), gravity = h.n(v.gravity);
+          const energy = mass * gravity * height;
+          return [
+              { label: 'Potential energy', value: energy, unit: 'J' },
+              { label: 'Potential energy (kJ)', value: energy / 1000, unit: 'kJ' },
+              { label: 'Weight', value: mass * gravity, unit: 'N' },
+          ];
+  },
+  "work-calculator": (v, h) => {
+          const force = h.n(v.force), distance = h.n(v.distance), angle = h.n(v.angle);
+          const effective = force * Math.cos(angle * Math.PI / 180);
+          const work = effective * distance;
+          return [
+              { label: 'Work', value: work, unit: 'J' },
+              { label: 'Work (kJ)', value: work / 1000, unit: 'kJ' },
+              { label: 'Effective force', value: effective, unit: 'N' },
+          ];
+  },
+  "momentum-calculator": (v, h) => {
+          const mass = h.n(v.mass), velocity = h.n(v.velocity);
+          return [
+              { label: 'Momentum', value: mass * velocity, unit: 'kg·m/s' },
+              { label: 'Kinetic energy', value: 0.5 * mass * velocity ** 2, unit: 'J' },
+              { label: 'Velocity', value: velocity, unit: 'm/s' },
+          ];
+  },
+  "wave-speed-calculator": (v, h) => {
+          const frequency = h.n(v.frequency), wavelength = h.n(v.wavelength);
+          if (frequency <= 0) throw new Error('Frequency must be greater than zero.');
+          return [
+              { label: 'Wave speed', value: frequency * wavelength, unit: 'm/s' },
+              { label: 'Period', value: 1 / frequency, unit: 's' },
+              { label: 'Frequency', value: frequency, unit: 'Hz' },
+          ];
+  },
+  "ideal-gas-law-calculator": (v, h) => {
+          const R = 8.314462618;
+          let P = h.n(v.pressure), V = h.n(v.volume), n = h.n(v.moles), T = h.n(v.temperature);
+          if (v.solveFor === 'pressure') {
+              if (V <= 0) throw new Error('Volume must be greater than zero.');
+              P = (n * R * T) / V;
+          } else if (v.solveFor === 'volume') {
+              if (P <= 0) throw new Error('Pressure must be greater than zero.');
+              V = (n * R * T) / P;
+          } else if (v.solveFor === 'moles') {
+              if (R * T === 0) throw new Error('Temperature must be greater than zero.');
+              n = (P * V) / (R * T);
+          } else {
+              if (n * R === 0) throw new Error('Moles must be greater than zero.');
+              T = (P * V) / (n * R);
+          }
+          return [
+              { label: 'Pressure', value: P, unit: 'kPa' },
+              { label: 'Volume', value: V, unit: 'L' },
+              { label: 'Moles', value: n, unit: 'mol' },
+              { label: 'Temperature', value: T, unit: 'K' },
+          ];
+  },
+  "molar-mass-calculator": (v, h) => {
+          const weights = {
+              H: 1.008, He: 4.0026, Li: 6.94, Be: 9.0122, B: 10.81, C: 12.011, N: 14.007, O: 15.999,
+              F: 18.998, Ne: 20.180, Na: 22.990, Mg: 24.305, Al: 26.982, Si: 28.085, P: 30.974,
+              S: 32.06, Cl: 35.45, Ar: 39.948, K: 39.098, Ca: 40.078, Ti: 47.867, Cr: 51.996,
+              Mn: 54.938, Fe: 55.845, Co: 58.933, Ni: 58.693, Cu: 63.546, Zn: 65.38, Br: 79.904,
+              Ag: 107.868, I: 126.904, Ba: 137.327, Au: 196.967, Hg: 200.592, Pb: 207.2, U: 238.029,
+          };
+          const formula = String(v.formula ?? '').replace(/\s+/g, '');
+          if (!formula) throw new Error('Enter a chemical formula.');
+          let i = 0;
+          const readNumber = () => {
+              let digits = '';
+              while (i < formula.length && /\d/.test(formula[i])) { digits += formula[i]; i++; }
+              return digits === '' ? 1 : parseInt(digits, 10);
+          };
+          const merge = (target, source, factor) => {
+              for (const [element, count] of Object.entries(source)) target[element] = (target[element] || 0) + count * factor;
+          };
+          const parseGroup = (closing) => {
+              const counts = {};
+              while (i < formula.length) {
+                  const ch = formula[i];
+                  if (ch === '(') {
+                      i++;
+                      const inner = parseGroup(')');
+                      if (formula[i] !== ')') throw new Error('Unbalanced parentheses.');
+                      i++;
+                      merge(counts, inner, readNumber());
+                  } else if (ch === ')') {
+                      if (closing === ')') return counts;
+                      throw new Error('Unexpected closing parenthesis.');
+                  } else if (/[A-Z]/.test(ch)) {
+                      let element = ch;
+                      i++;
+                      while (i < formula.length && /[a-z]/.test(formula[i])) { element += formula[i]; i++; }
+                      if (!(element in weights)) throw new Error('Unknown element: ' + element);
+                      counts[element] = (counts[element] || 0) + readNumber();
+                  } else {
+                      throw new Error('Unexpected character: ' + ch);
+                  }
+              }
+              if (closing) throw new Error('Unbalanced parentheses.');
+              return counts;
+          };
+          const counts = parseGroup(null);
+          const mass = Object.entries(counts).reduce((sum, [element, count]) => sum + weights[element] * count, 0);
+          const atoms = Object.values(counts).reduce((sum, count) => sum + count, 0);
+          return [
+              { label: 'Molar mass', value: mass, unit: 'g/mol' },
+              { label: 'Atoms', value: atoms, decimals: 0 },
+              { label: 'Formula', value: formula },
+          ];
+  },
+  "dilution-calculator": (v, h) => {
+          const c1 = h.n(v.c1), v1 = h.n(v.v1), c2 = h.n(v.c2);
+          if (c1 <= 0 || v1 <= 0 || c2 <= 0) throw new Error('Concentrations and volume must be greater than zero.');
+          if (c2 > c1) throw new Error('The final concentration cannot exceed the stock concentration.');
+          const v2 = (c1 * v1) / c2;
+          return [
+              { label: 'Final volume', value: v2, unit: 'mL' },
+              { label: 'Diluent volume', value: v2 - v1, unit: 'mL' },
+              { label: 'Dilution factor', value: c1 / c2 },
+          ];
+  },
+  "body-surface-area-calculator": (v, h) => {
+          const height = h.n(v.height), weight = h.n(v.weight);
+          if (height <= 0 || weight <= 0) throw new Error('Height and weight must be greater than zero.');
+          const mosteller = Math.sqrt((height * weight) / 3600);
+          const dubois = 0.007184 * Math.pow(height, 0.725) * Math.pow(weight, 0.425);
+          return [
+              { label: 'Body surface area', value: v.formula === 'dubois' ? dubois : mosteller, unit: 'm²' },
+              { label: 'Mosteller', value: mosteller, unit: 'm²' },
+              { label: 'Du Bois', value: dubois, unit: 'm²' },
+          ];
+  },
+  "heart-rate-zones-calculator": (v, h) => {
+          const age = Math.trunc(h.n(v.age)), resting = h.n(v.resting);
+          if (age <= 0 || age > 120) throw new Error('Enter an age between 1 and 120.');
+          if (resting <= 0 || resting > 220) throw new Error('Enter a valid resting heart rate.');
+          const max = 220 - age;
+          const zone = (low, high) => `${Math.round(resting + (max - resting) * low)}–${Math.round(resting + (max - resting) * high)} bpm`;
+          return [
+              { label: 'Max heart rate', value: max, unit: 'bpm' },
+              { label: 'Zone 1', value: zone(0.5, 0.6) },
+              { label: 'Zone 2', value: zone(0.6, 0.7) },
+              { label: 'Zone 3', value: zone(0.7, 0.8) },
+              { label: 'Zone 4', value: zone(0.8, 0.9) },
+              { label: 'Zone 5', value: zone(0.9, 1.0) },
+          ];
+  },
+  "led-resistor-calculator": (v, h) => {
+          const supply = h.n(v.supply), forward = h.n(v.forward), current = h.n(v.current), count = Math.max(1, Math.trunc(h.n(v.count)));
+          const drop = supply - forward * count;
+          if (drop <= 0) throw new Error('The supply voltage must exceed the total LED forward voltage.');
+          if (current <= 0) throw new Error('Current must be greater than zero.');
+          const resistance = drop / (current / 1000);
+          const e12 = [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82];
+          const decade = Math.pow(10, Math.floor(Math.log10(resistance)));
+          let nearest = Infinity;
+          for (const base of e12) {
+              for (const mult of [decade / 10, decade, decade * 10]) {
+                  const value = base * mult;
+                  if (value >= resistance && value < nearest) nearest = value;
+              }
+          }
+          return [
+              { label: 'Resistor', value: resistance, unit: 'Ω' },
+              { label: 'Nearest E12 resistor', value: nearest, unit: 'Ω' },
+              { label: 'Power dissipation', value: (drop * drop) / resistance, unit: 'W' },
+          ];
+  },
   "bmi-calculator": (v, h) => {
           const metric = v.mode !== 'imperial';
           const height = h.n(metric ? v.heightCm : v.heightIn);
@@ -2004,6 +3417,189 @@ export const TOOLS = {
               { label: 'Half-lives elapsed', value: halfLives, decimals: 2 },
               { label: 'Percentage remaining', value: (remaining / initial) * 100, unit: '%' },
           ];
+  },
+  "sentence-counter": (v, h) => {
+          const text = String(v.text ?? '');
+          const trimmed = text.trim();
+          const words = trimmed ? trimmed.split(/\s+/).filter(Boolean) : [];
+          const sentences = trimmed ? trimmed.split(/[.!?]+/).map((s) => s.trim()).filter(Boolean).length : 0;
+          const paragraphs = trimmed ? trimmed.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean).length : 0;
+          return [
+              { label: 'Sentences', value: sentences, decimals: 0 },
+              { label: 'Words', value: words.length, decimals: 0 },
+              { label: 'Paragraphs', value: paragraphs, decimals: 0 },
+              { label: 'Characters', value: text.length, decimals: 0 },
+          ];
+  },
+  "vowel-counter": (v, h) => {
+          const text = String(v.text ?? '');
+          const letters = text.match(/[a-z]/gi) || [];
+          const vowels = text.match(/[aeiou]/gi) || [];
+          const digits = text.match(/\d/g) || [];
+          return [
+              { label: 'Vowels', value: vowels.length, decimals: 0 },
+              { label: 'Consonants', value: letters.length - vowels.length, decimals: 0 },
+              { label: 'Letters', value: letters.length, decimals: 0 },
+              { label: 'Digits', value: digits.length, decimals: 0 },
+          ];
+  },
+  "text-statistics": (v, h) => {
+          const text = String(v.text ?? '');
+          const words = (text.match(/[A-Za-z0-9'’-]+/g) || []);
+          const unique = new Set(words.map((w) => w.toLowerCase()));
+          const totalLetters = words.reduce((sum, w) => sum + w.replace(/[^A-Za-z]/g, '').length, 0);
+          const longest = words.reduce((best, w) => (w.length > best.length ? w : best), '');
+          return [
+              { label: 'Words', value: words.length, decimals: 0 },
+              { label: 'Unique words', value: unique.size, decimals: 0 },
+              { label: 'Average word length', value: words.length ? totalLetters / words.length : 0 },
+              { label: 'Longest word', value: longest || '—' },
+              { label: 'Characters', value: text.length, decimals: 0 },
+          ];
+  },
+  "strip-html-tags": (v, h) => {
+          let text = String(v.html ?? '').replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
+          text = text.replace(/<[^>]*>/g, ' ');
+          const entities = { '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" };
+          text = text.replace(/&(?:nbsp|amp|lt|gt|quot|#39);/g, (m) => entities[m] || m);
+          text = text.replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim();
+          const words = text ? text.split(/\s+/).filter(Boolean) : [];
+          return [
+              { label: 'Text', value: text },
+              { label: 'Characters', value: text.length, decimals: 0 },
+              { label: 'Words', value: words.length, decimals: 0 },
+          ];
+  },
+  "line-numberer": (v, h) => {
+          const lines = String(v.text ?? '').split(/\r?\n/);
+          const start = Math.trunc(h.n(v.start));
+          const separators = { dot: '. ', colon: ': ', paren: ') ' };
+          const separator = separators[v.format] || '. ';
+          const numbered = lines.map((line, i) => `${start + i}${separator}${line}`);
+          return [
+              { label: 'Numbered text', value: numbered.join('\n') },
+              { label: 'Lines', value: lines.length, decimals: 0 },
+          ];
+  },
+  "text-padding": (v, h) => {
+          const text = String(v.text ?? '');
+          const width = Math.max(0, Math.trunc(h.n(v.width)));
+          const pad = String(v.pad ?? ' ') || ' ';
+          if (text.length >= width) {
+              return [
+                  { label: 'Padded text', value: text },
+                  { label: 'Original length', value: text.length, decimals: 0 },
+                  { label: 'Final length', value: text.length, decimals: 0 },
+              ];
+          }
+          const total = width - text.length;
+          let padded = text;
+          if (v.align === 'right') {
+              padded = pad.repeat(total) + text;
+          } else if (v.align === 'center') {
+              const left = Math.floor(total / 2);
+              padded = pad.repeat(left) + text + pad.repeat(total - left);
+          } else {
+              padded = text + pad.repeat(total);
+          }
+          return [
+              { label: 'Padded text', value: padded },
+              { label: 'Original length', value: text.length, decimals: 0 },
+              { label: 'Final length', value: padded.length, decimals: 0 },
+          ];
+  },
+  "truncate-text": (v, h) => {
+          const text = String(v.text ?? '');
+          const max = Math.max(1, Math.trunc(h.n(v.max)));
+          const suffix = String(v.suffix ?? '');
+          if (text.length <= max) {
+              return [
+                  { label: 'Truncated text', value: text },
+                  { label: 'Original length', value: text.length, decimals: 0 },
+                  { label: 'Truncated length', value: text.length, decimals: 0 },
+              ];
+          }
+          const keep = Math.max(0, max - suffix.length);
+          const output = suffix.length >= max ? suffix.slice(0, max) : text.slice(0, keep) + suffix;
+          return [
+              { label: 'Truncated text', value: output },
+              { label: 'Original length', value: text.length, decimals: 0 },
+              { label: 'Truncated length', value: output.length, decimals: 0 },
+          ];
+  },
+  "wrap-text": (v, h) => {
+          const words = String(v.text ?? '').trim().split(/\s+/).filter(Boolean);
+          const width = Math.max(1, Math.trunc(h.n(v.width)));
+          const lines = [];
+          let current = '';
+          for (const word of words) {
+              if (current === '') {
+                  current = word;
+              } else if (current.length + 1 + word.length <= width) {
+                  current += ' ' + word;
+              } else {
+                  lines.push(current);
+                  current = word;
+              }
+          }
+          if (current !== '') lines.push(current);
+          return [
+              { label: 'Wrapped text', value: lines.join('\n') },
+              { label: 'Lines', value: lines.length, decimals: 0 },
+          ];
+  },
+  "find-and-replace": (v, h) => {
+          const text = String(v.text ?? '');
+          const find = String(v.find ?? '');
+          if (find === '') throw new Error('Enter something to find.');
+          const replace = String(v.replace ?? '');
+          const flags = v.caseSensitive ? 'g' : 'gi';
+          const escaped = find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(escaped, flags);
+          const matches = text.match(regex);
+          return [
+              { label: 'Result', value: text.replace(regex, replace) },
+              { label: 'Replacements', value: matches ? matches.length : 0, decimals: 0 },
+          ];
+  },
+  "caesar-cipher": (v, h) => {
+          const shift = ((Math.trunc(h.n(v.shift)) % 26) + 26) % 26;
+          const amount = v.mode === 'decode' ? (26 - shift) % 26 : shift;
+          const result = String(v.text ?? '').replace(/[a-z]/gi, (ch) => {
+              const base = ch >= 'a' && ch <= 'z' ? 97 : 65;
+              return String.fromCharCode(((ch.charCodeAt(0) - base + amount) % 26) + base);
+          });
+          return [
+              { label: 'Result', value: result },
+              { label: 'Shift', value: shift, decimals: 0 },
+          ];
+  },
+  "rot13-converter": (v, h) => {
+          const result = String(v.text ?? '').replace(/[a-z]/gi, (ch) => {
+              const base = ch >= 'a' && ch <= 'z' ? 97 : 65;
+              return String.fromCharCode(((ch.charCodeAt(0) - base + 13) % 26) + base);
+          });
+          return { label: 'Result', value: result };
+  },
+  "morse-code-translator": (v, h) => {
+          const map = {
+              A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....',
+              I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.',
+              Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-',
+              Y: '-.--', Z: '--..', 0: '-----', 1: '.----', 2: '..---', 3: '...--', 4: '....-',
+              5: '.....', 6: '-....', 7: '--...', 8: '---..', 9: '----.',
+          };
+          const reverse = Object.fromEntries(Object.entries(map).map(([k, val]) => [val, k]));
+          if (v.mode === 'decode') {
+              const decoded = String(v.text ?? '').trim().split(/\s*\/\s*/).map((word) =>
+                  word.trim().split(/\s+/).filter(Boolean).map((code) => reverse[code] || '?').join('')
+              ).join(' ');
+              return { label: 'Result', value: decoded };
+          }
+          const encoded = String(v.text ?? '').toUpperCase().split(/\s+/).filter(Boolean).map((word) =>
+              [...word].map((ch) => map[ch] || '').filter(Boolean).join(' ')
+          ).join(' / ');
+          return { label: 'Result', value: encoded };
   },
   "word-counter": (v, h) => {
           const raw = String(v.text ?? '');
@@ -2235,104 +3831,204 @@ export const TOOLS = {
 };
 
 export const TOOL_SLUGS = [
+    "acceleration-calculator",
+    "acceleration-converter",
+    "add-business-days",
     "age-calculator",
     "anagram-checker",
     "angle-converter",
+    "aquarium-volume-calculator",
     "area-converter",
+    "aspect-ratio-calculator",
+    "attendance-calculator",
     "average-calculator",
     "base64-encoder-decoder",
     "binary-converter",
     "bmi-calculator",
     "bmr-calorie-calculator",
+    "body-surface-area-calculator",
     "break-even-calculator",
     "business-days-calculator",
+    "caesar-cipher",
+    "cagr-calculator",
+    "calendar-generator",
     "case-converter",
+    "cgpa-calculator",
     "character-counter",
+    "chinese-zodiac-finder",
+    "cidr-calculator",
     "circle-calculator",
+    "citation-generator",
+    "coffee-ratio-calculator",
+    "color-contrast-checker",
     "color-converter",
     "compound-interest-calculator",
+    "cone-calculator",
     "cooking-measurement-converter",
     "countdown-to-date",
+    "credit-utilization-calculator",
+    "css-minifier",
+    "cylinder-calculator",
     "data-storage-converter",
+    "data-transfer-rate-converter",
     "date-add-subtract",
     "date-format-converter",
     "day-of-week-finder",
     "days-between-dates",
+    "debt-payoff-calculator",
+    "debt-to-income-calculator",
     "density-calculator",
+    "density-converter",
+    "dilution-calculator",
     "discount-calculator",
+    "dividend-yield-calculator",
     "electricity-cost-calculator",
+    "email-validator",
+    "emergency-fund-calculator",
     "energy-converter",
     "factorial-calculator",
     "final-grade-calculator",
+    "find-and-replace",
+    "flow-rate-converter",
     "force-calculator",
+    "force-converter",
     "fraction-calculator",
+    "frequency-converter",
     "fuel-consumption-converter",
     "fuel-cost-calculator",
+    "future-value-calculator",
     "gcd-lcm-calculator",
     "gpa-calculator",
     "half-life-calculator",
     "hash-generator",
+    "heart-rate-zones-calculator",
     "hex-decimal-converter",
     "html-entity-encoder",
+    "html-minifier",
+    "http-status-lookup",
+    "ideal-gas-law-calculator",
     "ideal-weight-calculator",
+    "illuminance-converter",
     "inflation-calculator",
+    "ip-address-info",
     "json-formatter",
+    "json-validator",
+    "julian-date-converter",
     "jwt-decoder",
+    "kinetic-energy-calculator",
     "leap-year-checker",
+    "led-resistor-calculator",
     "length-converter",
+    "letter-grade-calculator",
+    "line-numberer",
     "loan-payment-calculator",
+    "loan-to-value-calculator",
+    "logarithm-calculator",
     "lorem-ipsum-generator",
+    "luhn-validator",
     "markdown-table-generator",
+    "median-calculator",
+    "midpoint-calculator",
+    "mode-calculator",
+    "molar-mass-calculator",
     "molarity-calculator",
+    "momentum-calculator",
+    "months-between-dates",
+    "moon-phase-calculator",
+    "morse-code-translator",
+    "mortgage-calculator",
     "multiplication-table-generator",
+    "next-birthday-calculator",
     "number-base-converter",
+    "number-to-words",
     "ohms-law-calculator",
     "pace-calculator",
     "paint-coverage-calculator",
     "palindrome-checker",
+    "paper-size-converter",
     "password-generator",
     "percentage-calculator",
+    "percentile-calculator",
     "ph-calculator",
+    "pizza-size-comparator",
+    "potential-energy-calculator",
     "power-converter",
+    "present-value-calculator",
     "pressure-converter",
     "prime-number-checker",
     "profit-margin-calculator",
+    "pythagorean-theorem-calculator",
     "quadratic-equation-solver",
+    "query-string-parser",
+    "quiz-score-calculator",
     "random-number-generator",
     "ratio-calculator",
     "reading-time-calculator",
+    "recipe-scaler",
+    "rectangle-calculator",
+    "regex-tester",
     "remove-duplicate-lines",
+    "rent-split-calculator",
     "reverse-text",
     "roi-calculator",
     "roman-numeral-converter",
+    "rot13-converter",
     "rounding-calculator",
     "salary-hourly-converter",
+    "sales-tax-calculator",
     "savings-goal-calculator",
     "scientific-notation-converter",
+    "season-finder",
+    "semver-comparator",
+    "sentence-counter",
+    "significant-figures-counter",
     "simple-interest-calculator",
     "sleep-cycle-calculator",
+    "slope-calculator",
     "slug-generator",
     "sort-lines",
     "speed-converter",
     "speed-distance-time-calculator",
+    "sphere-calculator",
+    "standard-deviation-calculator",
+    "stock-profit-calculator",
+    "strip-html-tags",
+    "study-time-planner",
+    "subscription-cost-calculator",
     "temperature-converter",
     "test-score-percentage",
+    "text-padding",
+    "text-statistics",
     "tile-calculator",
+    "time-card-calculator",
     "time-duration-calculator",
     "time-unit-converter",
     "tip-calculator",
+    "torque-converter",
+    "trapezoid-area-calculator",
     "triangle-area-calculator",
+    "truncate-text",
+    "typography-converter",
     "unit-price-comparator",
     "unix-timestamp-converter",
     "url-encoder-decoder",
+    "url-parser",
     "uuid-generator",
+    "uuid-validator",
     "vat-calculator",
+    "viscosity-converter",
     "volume-converter",
+    "vowel-counter",
     "water-intake-calculator",
+    "wave-speed-calculator",
     "week-number-calculator",
     "weight-converter",
     "weighted-grade-calculator",
     "whitespace-remover",
     "word-counter",
-    "word-frequency-counter"
+    "word-frequency-counter",
+    "work-calculator",
+    "wrap-text",
+    "z-score-calculator",
+    "zodiac-sign-finder"
 ];

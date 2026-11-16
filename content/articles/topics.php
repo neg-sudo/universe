@@ -1,7 +1,8 @@
 <?php
 /**
- * KnowledgeWorld topic plan — 500 encyclopedic topics grouped by category.
- * Content is fetched from Wikipedia (CC BY-SA 4.0) by scripts/fetch-wikipedia.php.
+ * KnowledgeWorld curated topic plan grouped by category. The harvester uses
+ * these titles first, then expands through content/articles/sources.php.
+ * Content is fetched from Wikipedia (CC BY-SA 4.0) by scripts/harvest-wikipedia.php.
  * Every article page links back to its source and credits the licence.
  */
 

@@ -25,6 +25,10 @@ $errors = [];
 $seen = [];
 
 foreach ($files as $file) {
+    if (basename($file) === 'categories.php') {
+        continue;
+    }
+
     $definitions = require $file;
     if (!is_array($definitions)) {
         $errors[] = basename($file) . ': must return an array of tool definitions';

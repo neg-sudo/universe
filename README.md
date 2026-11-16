@@ -4,13 +4,13 @@
 
 UniVerse is a single, fast, account-free web platform that combines two products:
 
-- **UtilityWorld** — 100 interactive tools: calculators, converters, generators, text utilities and developer helpers.
-- **KnowledgeWorld** — 500 sourced educational articles adapted from Wikipedia, grouped into ten subject areas.
+- **UtilityWorld** — 200 interactive tools: calculators, converters, generators, text utilities and developer helpers.
+- **KnowledgeWorld** — 10,000 sourced educational articles adapted from Wikipedia, grouped into ten subject areas.
 
 Everything is searchable from one place. Calculators run in the browser, so sensitive numbers never leave the device.
 
 ```
-100 tools · 500 articles · 9 tool categories · 10 knowledge categories
+200 tools · 10,000 articles · 9 tool categories · 10 knowledge categories
 ```
 
 ## Highlights
@@ -21,7 +21,7 @@ Everything is searchable from one place. Calculators run in the browser, so sens
 - **Sourced knowledge.** Every article records its Wikipedia source, licence (CC BY-SA 4.0) and retrieval date.
 - **Accessible and responsive.** Keyboard-friendly navigation, skip link, reduced-motion support, semantic markup and a mobile layout.
 - **Portable database.** SQLite for local development, PostgreSQL-ready schema and portable SQL.
-- **Tested calculations.** Every tool ships with at least two test cases; 749 assertions currently pass.
+- **Tested calculations.** Every tool ships with at least two test cases; 1,529 assertions currently pass.
 - **No front-end build step.** Plain CSS and ES modules are served directly from `public/assets`.
 
 ## Requirements
@@ -46,7 +46,7 @@ php artisan serve
 
 Open <http://localhost:8000>.
 
-The seeders import the tool catalogue and all 500 articles, so the first seed takes a few seconds.
+The seeders import the tool catalogue and the 10,000-article catalogue, so the first seed takes a few seconds.
 
 ### Rebuilding from scratch
 
@@ -91,11 +91,10 @@ node scripts/test-tools.mjs     # run every declared test case
 php artisan db:seed --class=ToolSeeder
 ```
 
-Articles are fetched from the Wikipedia API and stored in `content/articles/data.json`:
+Articles are harvested from the Wikipedia API into sharded JSONL files under `content/articles/data/`:
 
 ```bash
-php scripts/fetch-wikipedia.php            # resumable; caches API responses
-php scripts/fetch-wikipedia.php --refresh  # ignore the cache
+php scripts/harvest-wikipedia.php          # resumable; caches API responses
 php artisan db:seed --class=ArticleSeeder
 ```
 
@@ -133,7 +132,7 @@ public/assets/
 scripts/
   build-tools.php            Validate and compile tools
   test-tools.mjs             Run tool test cases
-  fetch-wikipedia.php        Fetch and cache article content
+  harvest-wikipedia.php      Harvest and shard article content
 docs/                        Architecture, database, API and schema docs
 ```
 

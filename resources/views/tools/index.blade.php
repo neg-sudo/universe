@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'All tools — UniVerse UtilityWorld')
-@section('description', 'Browse 100 practical calculators, converters, generators and developer utilities. Free, fast and private.')
+@section('description', 'Browse 200 practical calculators, converters, generators and developer utilities. Free, fast and private.')
 
 @section('content')
     <section class="page-head">

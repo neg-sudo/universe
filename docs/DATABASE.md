@@ -7,9 +7,9 @@ UniVerse uses SQLite for local development and is ready for PostgreSQL in produc
 | Table | Purpose | Rows after seeding |
 | --- | --- | ---: |
 | `tool_categories` | Tool groupings | 12 |
-| `tools` | Published tool catalogue and input schemas | 100 |
+| `tools` | Published tool catalogue and input schemas | 200 |
 | `article_categories` | Knowledge subject areas | 10 |
-| `articles` | Sourced knowledge articles | 500 |
+| `articles` | Sourced knowledge articles | 10,000 |
 | `bookmarks` | Optional saved items for future accounts | 0 |
 | `tool_usage_events` | Privacy-friendly usage counts | grows with traffic |
 | `search_logs` | Search term analytics | grows with traffic |
@@ -175,7 +175,7 @@ php artisan migrate:fresh --seed
 ```
 
 - `ToolSeeder` reads `content/tools/*.php` through `ToolRegistry` and uses `updateOrCreate` by slug.
-- `ArticleSeeder` reads `content/articles/data.json`, creates categories by slug and uses `updateOrCreate` by article slug.
+- `ArticleSeeder` streams the sharded JSONL files listed in `content/articles/data/manifest.json`, creates categories by slug and uses `updateOrCreate` by article slug. Set `SEED_ARTICLE_LIMIT` to seed only the first N records.
 
 ## Portability notes
 
@@ -188,4 +188,4 @@ php artisan migrate:fresh --seed
 
 - Back up `database/database.sqlite` (or the PostgreSQL database) and `content/` together. Content files are the reproducible source of truth.
 - `tool_usage_events` and `search_logs` can be pruned periodically; they are not needed to render the site.
-- Wikipedia content is stored with attribution metadata, so re-importing `data.json` is always safe.
+- Wikipedia content is stored with attribution metadata, so re-importing the article shards is always safe.

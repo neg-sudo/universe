@@ -20,12 +20,15 @@ class PlatformTest extends TestCase
 
     public function test_home_page_loads_with_live_catalogue_counts(): void
     {
+        $tools = Tool::published()->count();
+        $articles = Article::published()->count();
+
         $response = $this->get('/');
 
         $response->assertOk();
         $response->assertSee('UniVerse');
-        $response->assertSee('100');
-        $response->assertSee('500');
+        $response->assertSee((string) $tools);
+        $response->assertSee((string) $articles);
     }
 
     public function test_tools_index_and_category_filter_work(): void
@@ -68,11 +71,16 @@ class PlatformTest extends TestCase
 
     public function test_search_returns_tools_and_articles_together(): void
     {
-        $response = $this->get('/search?q=percentage');
+        $article = Article::query()->published()->firstOrFail();
 
+        $response = $this->get('/search?q=percentage');
         $response->assertOk();
         $response->assertSee('Percentage Calculator');
-        $response->assertSee('knowledge/');
+
+        $this->get('/search?q=' . urlencode($article->title))
+            ->assertOk()
+            ->assertSee($article->title)
+            ->assertSee('knowledge/');
 
         // Keyword-only matches exercise the JSON-cast path used by PostgreSQL.
         $this->get('/search?q=discount')
@@ -96,12 +104,12 @@ class PlatformTest extends TestCase
     {
         $this->getJson('/api/v1/tools')
             ->assertOk()
-            ->assertJsonPath('meta.total', 100)
+            ->assertJsonPath('meta.total', Tool::published()->count())
             ->assertJsonStructure(['data' => [['slug', 'name', 'category', 'url']], 'meta' => ['current_page', 'last_page', 'per_page', 'total']]);
 
         $this->getJson('/api/v1/articles')
             ->assertOk()
-            ->assertJsonPath('meta.total', 500);
+            ->assertJsonPath('meta.total', Article::published()->count());
 
         $this->getJson('/api/v1/search?q=percentage')
             ->assertOk()

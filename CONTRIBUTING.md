@@ -46,7 +46,7 @@ Do not edit `public/assets/js/tools.generated.js` or `public/assets/data/tools.j
 Article topics are listed in `content/articles/topics.php`. Content is fetched from Wikipedia:
 
 ```bash
-php scripts/fetch-wikipedia.php
+php scripts/harvest-wikipedia.php
 php artisan db:seed --class=ArticleSeeder
 ```
 

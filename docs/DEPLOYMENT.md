@@ -69,7 +69,7 @@ Never commit `.env`, database files or `tokens.md`.
    ```
 4. Keep it secret. It becomes the `DB_URL` value in Render.
 
-Neon's free database is small but more than enough for 100 tools and 500 articles. It suspends when idle and resumes automatically.
+Neon's free database (0.5 GB) comfortably holds 200 tools and 10,000 articles, but the seed must stream the sharded JSONL files to stay inside Render's 512 MB memory limit. It suspends when idle and resumes automatically.
 
 ## 3. Deploy on Render
 

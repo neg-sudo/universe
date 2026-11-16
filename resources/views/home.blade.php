@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'UniVerse — Tools for Life. Knowledge for Everyone.')
-@section('description', 'Practical tools and reliable knowledge in one place. Explore 100 calculators, converters and generators, plus a searchable library of educational articles.')
+@section('description', 'Practical tools and reliable knowledge in one place. Explore 200 calculators, converters and generators, plus a searchable library of 10,000 educational articles.')
 
 @section('content')
     <section class="hero">

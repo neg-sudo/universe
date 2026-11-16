@@ -1,0 +1,110 @@
+{
+    "generated_at": "2026-11-16T14:42:56+00:00",
+    "source": "Wikipedia",
+    "source_url": "https://en.wikipedia.org/",
+    "license": "CC BY-SA 4.0",
+    "language": "en",
+    "count": 10000,
+    "planned": 13760,
+    "skipped": 2306,
+    "shard_size": 1000,
+    "shards": [
+        {
+            "file": "part-0000.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0001.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0002.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0003.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0004.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0005.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0006.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0007.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0008.jsonl",
+            "count": 1000
+        },
+        {
+            "file": "part-0009.jsonl",
+            "count": 1000
+        }
+    ],
+    "categories": {
+        "economics": 956,
+        "engineering": 1195,
+        "geography": 952,
+        "health": 952,
+        "history": 1181,
+        "languages": 677,
+        "life-skills": 714,
+        "mathematics": 915,
+        "science": 1045,
+        "technology": 1413
+    },
+    "subcategories": {
+        "economics/finance": 239,
+        "economics/macroeconomics": 239,
+        "economics/microeconomics": 239,
+        "economics/trade": 239,
+        "engineering/chemical": 239,
+        "engineering/civil": 239,
+        "engineering/electrical": 239,
+        "engineering/materials": 239,
+        "engineering/mechanical": 239,
+        "geography/cities": 238,
+        "geography/countries": 238,
+        "geography/oceans-and-seas": 238,
+        "geography/physical-geography": 238,
+        "health/diseases": 238,
+        "health/human-body": 238,
+        "health/mental-health": 238,
+        "health/nutrition": 238,
+        "history/ancient": 229,
+        "history/civilizations": 238,
+        "history/medieval": 238,
+        "history/modern": 238,
+        "history/world-wars": 238,
+        "languages/english": 238,
+        "languages/linguistics": 238,
+        "languages/world-languages": 201,
+        "life-skills/communication": 238,
+        "life-skills/personal-finance": 238,
+        "life-skills/productivity": 238,
+        "mathematics/algebra": 228,
+        "mathematics/foundations": 238,
+        "mathematics/geometry": 238,
+        "mathematics/probability-statistics": 211,
+        "science/astronomy": 238,
+        "science/biology": 238,
+        "science/chemistry": 93,
+        "science/earth-science": 238,
+        "science/physics": 238,
+        "technology/artificial-intelligence": 238,
+        "technology/computing": 238,
+        "technology/electronics": 238,
+        "technology/energy-technology": 238,
+        "technology/internet": 238,
+        "technology/space-technology": 223
+    }
+}

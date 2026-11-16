@@ -52,7 +52,8 @@ final class SearchService
             ->get()
             ->map(fn (Article $article) => $this->articleResult($article, $needle));
 
-        return $tools->merge($articles)
+        return $tools->toBase()
+            ->merge($articles->toBase())
             ->sortByDesc('score')
             ->take($limit)
             ->values()
